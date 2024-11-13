@@ -24,16 +24,6 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
-//        val switchCompat = findViewById<Switch>(R.id.switch_compat)
-//
-//        switchCompat.setOnCheckedChangeListener { buttonView, isChecked ->
-//            if (isChecked) {
-//                println("Switch включен")
-//            } else {
-//                println("Switch выключен")
-//            }
-//        }
-
         val buttonShare = findViewById<FrameLayout>(R.id.buttonShare)
 
         buttonShare.setOnClickListener {
