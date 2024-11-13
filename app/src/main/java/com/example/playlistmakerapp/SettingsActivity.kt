@@ -27,41 +27,39 @@ class SettingsActivity : AppCompatActivity() {
         val buttonShare = findViewById<FrameLayout>(R.id.buttonShare)
 
         buttonShare.setOnClickListener {
+            val message = getString(R.string.shareText)
+            val shareTitle = getString(R.string.shareTitle)
             val intent = Intent(Intent.ACTION_SEND)
-            val message =
-                "Привет! Посмотри этот курс по Android-разработке в Практикуме: https://practicum.yandex.ru/android-developer/"
+
             intent.type = "text/plain"
             intent.putExtra(Intent.EXTRA_TEXT, message)
 
-            startActivity(Intent.createChooser(intent, "Поделиться через"))
+            startActivity(Intent.createChooser(intent, shareTitle))
         }
 
         val buttonSupport = findViewById<FrameLayout>(R.id.buttonSupport)
 
         buttonSupport.setOnClickListener {
+            val extraSubject = getString(R.string.extraSubject)
+            val extraText = getString(R.string.extraText)
+            val sendTitle = getString(R.string.sendTitle)
+            val email = getString(R.string.email)
+
             intent.type = "text/plain"
             val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
-            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("senty.goldsun@gmail.com"))
-            intent.putExtra(
-                Intent.EXTRA_SUBJECT,
-                "Сообщение разработчикам и разработчицам приложения Playlist Maker"
-            )
-            intent.putExtra(
-                Intent.EXTRA_TEXT,
-                "Спасибо разработчикам и разработчицам за крутое приложение!"
-            )
-            startActivity(Intent.createChooser(intent, "Выберите почтовый клиент"))
+            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+            intent.putExtra(Intent.EXTRA_SUBJECT, extraSubject)
+            intent.putExtra(Intent.EXTRA_TEXT, extraText)
+            startActivity(Intent.createChooser(intent, sendTitle))
         }
-
 
         val buttonAgreement = findViewById<FrameLayout>(R.id.buttonAgreement)
 
         buttonAgreement.setOnClickListener {
+            val agreementText = getString(R.string.agreementText)
             val intent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://yandex.ru/legal/practicum_offer/"))
+                Intent(Intent.ACTION_VIEW, Uri.parse(agreementText))
             startActivity(intent)
         }
-
-
     }
 }

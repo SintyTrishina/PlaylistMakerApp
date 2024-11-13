@@ -16,13 +16,22 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class Search : AppCompatActivity() {
+
+    private var userText: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val inputEditText = findViewById<EditText>(R.id.inputEditText)
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
         val buttonBack = findViewById<ImageView>(R.id.back)
+
+        if (savedInstanceState != null) {
+            userText = savedInstanceState.getString(USER_TEXT, "")
+            inputEditText.setText(userText)
+        }
 
         buttonBack.setOnClickListener {
             finish()
@@ -31,7 +40,8 @@ class Search : AppCompatActivity() {
         clearButton.setOnClickListener {
             inputEditText.setText("")
             clearButton.visibility = View.GONE
-            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            val inputMethodManager =
+                getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
         }
 
@@ -44,9 +54,20 @@ class Search : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
+                userText = s.toString()
             }
         }
         inputEditText.addTextChangedListener(textWatcher)
+    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(USER_TEXT, userText)
+    }
+
+    companion object {
+        const val USER_TEXT = "USER_TEXT"
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {

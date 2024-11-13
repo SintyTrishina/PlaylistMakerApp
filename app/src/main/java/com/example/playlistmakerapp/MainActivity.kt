@@ -16,7 +16,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         val button1 = findViewById<Button>(R.id.button1)
 
         button1.setOnClickListener {
@@ -37,7 +36,5 @@ class MainActivity : AppCompatActivity() {
             val intent3 = Intent(this, SettingsActivity::class.java)
             startActivity(intent3)
         }
-
-
     }
 }
