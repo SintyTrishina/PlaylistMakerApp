@@ -23,32 +23,26 @@
             android:text="@string/app_name_screen" />
     </FrameLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <Button
+        android:id="@+id/button1"
+        style="@style/ButtonStyle"
         android:layout_marginTop="24dp"
-        android:orientation="vertical">
+        android:text="@string/search"
+        app:icon="@drawable/search" />
 
-        <Button
-            android:id="@+id/button1"
-            style="@style/ButtonStyle"
-            android:text="@string/search"
-            app:icon="@drawable/search" />
+    <Button
+        android:id="@+id/button2"
+        style="@style/ButtonStyle"
+        android:layout_marginTop="@dimen/padding"
+        android:text="@string/media"
+        app:icon="@drawable/media" />
 
-        <Button
-            android:id="@+id/button2"
-            style="@style/ButtonStyle"
-            android:layout_marginTop="@dimen/padding"
-            android:text="@string/media"
-            app:icon="@drawable/media" />
+    <Button
+        android:id="@+id/button3"
+        style="@style/ButtonStyle"
+        android:layout_marginTop="@dimen/padding"
+        android:text="@string/settings"
+        app:icon="@drawable/settings" />
 
-        <Button
-            android:id="@+id/button3"
-            style="@style/ButtonStyle"
-            android:layout_marginTop="@dimen/padding"
-            android:text="@string/settings"
-            app:icon="@drawable/settings" />
-
-    </LinearLayout>
 
 </LinearLayout>

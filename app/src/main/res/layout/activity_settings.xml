@@ -36,84 +36,82 @@
             android:text="@string/settings" />
     </LinearLayout>
 
-    <LinearLayout
+
+    <FrameLayout
+        android:id="@+id/buttonNightMode"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
         android:paddingLeft="@dimen/padding"
         android:paddingTop="24dp">
 
-        <FrameLayout
-            android:id="@+id/buttonNightMode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <TextView
+            style="@style/SmallTextStyle"
+            android:text="@string/night" />
 
-            <TextView
-                style="@style/SmallTextStyle"
-                android:text="@string/night" />
-
-            <Switch
-                android:id="@+id/switch_compat"
-                style="@style/Switch"
-                android:layout_width="56dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="6dp"
-                android:layout_marginBottom="11dp"
-                android:state_checked="false"
-                tools:ignore="UseSwitchCompatOrMaterialXml" />
+        <Switch
+            android:id="@+id/switch_compat"
+            style="@style/Switch"
+            android:layout_width="56dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="6dp"
+            android:layout_marginBottom="11dp"
+            android:state_checked="false"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
 
-        </FrameLayout>
+    </FrameLayout>
 
-        <FrameLayout
-            android:id="@+id/buttonShare"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <FrameLayout
+        android:id="@+id/buttonShare"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding">
 
-            <ImageView
-                style="@style/ImageStyle"
-                android:src="@drawable/share" />
+        <ImageView
+            style="@style/ImageStyle"
+            android:src="@drawable/share" />
 
-            <TextView
-                style="@style/SmallTextStyle"
-                android:text="@string/share" />
+        <TextView
+            style="@style/SmallTextStyle"
+            android:text="@string/share" />
 
-        </FrameLayout>
-
-
-        <FrameLayout
-            android:id="@+id/buttonSupport"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                style="@style/ImageStyle"
-                android:src="@drawable/support" />
-
-            <TextView
-                style="@style/SmallTextStyle"
-                android:text="@string/support" />
-
-        </FrameLayout>
+    </FrameLayout>
 
 
-        <FrameLayout
-            android:id="@+id/buttonAgreement"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <FrameLayout
+        android:id="@+id/buttonSupport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding">
 
-            <ImageView
-                style="@style/ImageStyle"
-                android:src="@drawable/agreement" />
+        <ImageView
+            style="@style/ImageStyle"
+            android:src="@drawable/support" />
 
-            <TextView
-                style="@style/SmallTextStyle"
-                android:text="@string/agreement" />
+        <TextView
+            style="@style/SmallTextStyle"
+            android:text="@string/support" />
 
-        </FrameLayout>
+    </FrameLayout>
 
-    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/buttonAgreement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding">
+
+        <ImageView
+            style="@style/ImageStyle"
+            android:src="@drawable/agreement" />
+
+        <TextView
+            style="@style/SmallTextStyle"
+            android:text="@string/agreement" />
+
+    </FrameLayout>
+
 
 </LinearLayout>

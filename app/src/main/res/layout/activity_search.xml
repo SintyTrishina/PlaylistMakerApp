@@ -59,6 +59,7 @@
             android:paddingLeft="@dimen/imagePadding"
             android:textColor="@color/black"
             android:textColorHint="@color/textColorHint"
+            android:textCursorDrawable="@drawable/blue_cursor"
             android:textFontWeight="400"
             android:textSize="@dimen/smallText" />
 
