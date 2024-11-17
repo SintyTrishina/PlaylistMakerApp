@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/ModeSettingsScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:orientation="vertical"
     tools:context=".SettingsActivity">
 
@@ -18,144 +18,100 @@
 
         <ImageView
             android:id="@+id/back"
+            style="@style/ArrowBack"
             android:layout_width="@dimen/dimenSize"
             android:layout_height="@dimen/dimenSize"
             android:paddingHorizontal="@dimen/imagePadding"
             android:paddingVertical="@dimen/imagePadding"
-            android:src="@drawable/arrowback"
-            app:tint="@color/black" />
+            android:src="@drawable/arrowback" />
 
         <TextView
+            style="@style/TopText"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dimenSize"
             android:gravity="center|start"
             android:paddingLeft="@dimen/imagePadding"
             android:paddingTop="10dp"
             android:paddingBottom="@dimen/imagePadding"
-            android:text="@string/settings"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="@dimen/textSize"
-            android:textStyle="bold" />
+            android:text="@string/settings" />
     </LinearLayout>
 
-    <LinearLayout
+
+    <FrameLayout
+        android:id="@+id/buttonNightMode"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
         android:paddingLeft="@dimen/padding"
         android:paddingTop="24dp">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <TextView
+            style="@style/SmallTextStyle"
+            android:text="@string/night" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/textPadding"
-                android:layout_marginBottom="@dimen/textPadding"
-                android:text="@string/night"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:textSize="@dimen/smallText" />
-
-            <Switch
-                android:id="@+id/switch_compat"
-                android:layout_width="56dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="6dp"
-                android:layout_marginBottom="11dp"
-                android:checked="false"
-                tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="@dimen/iconSize"
-                android:layout_height="@dimen/iconSize"
-                android:layout_gravity="end"
-                android:layout_marginTop="19dp"
-                android:layout_marginRight="12dp"
-                android:layout_marginBottom="18dp"
-                android:gravity="center_vertical"
-                android:src="@drawable/share"
-                app:tint="@color/gray" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/textPadding"
-                android:layout_marginBottom="@dimen/textPadding"
-                android:text="@string/share"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:textSize="@dimen/smallText" />
-
-        </FrameLayout>
+        <Switch
+            android:id="@+id/switch_compat"
+            style="@style/Switch"
+            android:layout_width="56dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="6dp"
+            android:layout_marginBottom="11dp"
+            android:state_checked="false"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    </FrameLayout>
 
-            <ImageView
-                android:layout_width="@dimen/iconSize"
-                android:layout_height="@dimen/iconSize"
-                android:layout_gravity="end"
-                android:layout_marginTop="19dp"
-                android:layout_marginRight="12dp"
-                android:layout_marginBottom="18dp"
-                android:gravity="center_vertical"
-                android:src="@drawable/support"
-                app:tint="@color/gray" />
+    <FrameLayout
+        android:id="@+id/buttonShare"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/textPadding"
-                android:layout_marginBottom="@dimen/textPadding"
-                android:text="@string/support"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:textSize="@dimen/smallText" />
+        <ImageView
+            style="@style/ImageStyle"
+            android:src="@drawable/share" />
 
-        </FrameLayout>
+        <TextView
+            style="@style/SmallTextStyle"
+            android:text="@string/share" />
+
+    </FrameLayout>
 
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <FrameLayout
+        android:id="@+id/buttonSupport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding">
 
-            <ImageView
-                android:layout_width="@dimen/iconSize"
-                android:layout_height="@dimen/iconSize"
-                android:layout_gravity="end"
-                android:layout_marginTop="19dp"
-                android:layout_marginRight="12dp"
-                android:layout_marginBottom="18dp"
-                android:gravity="center_vertical"
-                android:src="@drawable/agreement"
-                app:tint="@color/gray" />
+        <ImageView
+            style="@style/ImageStyle"
+            android:src="@drawable/support" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/textPadding"
-                android:layout_marginBottom="@dimen/textPadding"
-                android:text="@string/agreement"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:textSize="@dimen/smallText" />
+        <TextView
+            style="@style/SmallTextStyle"
+            android:text="@string/support" />
 
-        </FrameLayout>
+    </FrameLayout>
 
-    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/buttonAgreement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding">
+
+        <ImageView
+            style="@style/ImageStyle"
+            android:src="@drawable/agreement" />
+
+        <TextView
+            style="@style/SmallTextStyle"
+            android:text="@string/agreement" />
+
+    </FrameLayout>
+
 
 </LinearLayout>

@@ -8,8 +8,8 @@
     <color name="switch_thumb_active_color">#3772E7</color>
     <color name="switch_track_inactive_color">#E6E8EB</color>
     <color name="switch_track_active_color">#9FBBF3</color>
-    <color name="editTextTint">#E6E8EB</color>
-    <color name="backgroundSettingsScreen">#FFFFFFFF</color>
-    <color name="textColorHint">#AEAFB4</color>
-    <color name="drawableTint">#AEAFB4</color>
+    <color name="editTextTint">#FFFFFF</color>
+    <color name="backgroundSettingsScreen">#1A1B22</color>
+    <color name="textColorHint">#1A1B22</color>
+    <color name="drawableTint">#1A1B22</color>
 </resources>

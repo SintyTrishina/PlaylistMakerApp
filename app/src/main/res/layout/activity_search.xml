@@ -1,17 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundSettingsScreen"
+    android:orientation="vertical"
     tools:context=".Search">
 
-    <TextView
-        android:id="@+id/message"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="Экран поиска" />
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/smallPadding"
+        android:paddingTop="@dimen/smallPadding"
+        android:paddingBottom="@dimen/smallPadding">
 
-</FrameLayout>
+        <ImageView
+            android:id="@+id/back"
+            style="@style/ArrowBack"
+            android:layout_width="@dimen/dimenSize"
+            android:layout_height="@dimen/dimenSize"
+            android:paddingHorizontal="@dimen/imagePadding"
+            android:paddingVertical="@dimen/imagePadding"
+            android:src="@drawable/arrowback" />
+
+        <TextView
+            style="@style/TopText"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/dimenSize"
+            android:gravity="center|start"
+            android:paddingLeft="@dimen/imagePadding"
+            android:paddingTop="10dp"
+            android:paddingBottom="@dimen/imagePadding"
+            android:text="@string/search" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/padding"
+        android:paddingVertical="@dimen/iconPadding">
+
+        <EditText
+            android:id="@+id/inputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:background="@drawable/round_corner"
+            android:drawableLeft="@drawable/search_icon"
+            android:drawablePadding="@dimen/iconPadding"
+            android:drawableTint="@color/drawableTint"
+            android:fontFamily="@font/ys_display_regular"
+            android:hint="@string/search"
+            android:inputType="text"
+            android:letterSpacing="0"
+            android:maxLines="1"
+            android:paddingLeft="@dimen/imagePadding"
+            android:textColor="@color/black"
+            android:textColorHint="@color/textColorHint"
+            android:textCursorDrawable="@drawable/blue_cursor"
+            android:textFontWeight="400"
+            android:textSize="@dimen/smallText" />
+
+        <ImageView
+            android:id="@+id/clearIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:visibility="gone"
+            app:tint="@color/drawableTint" />
+
+
+    </FrameLayout>
+
+
+</LinearLayout>
