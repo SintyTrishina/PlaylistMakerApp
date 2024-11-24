@@ -55,6 +55,14 @@ class Search : AppCompatActivity() {
             }
         }
         inputEditText.addTextChangedListener(textWatcher)
+
+        val searchList = listOf(
+            Track(R.string.trackName1.toString(), R.string.artistName1.toString(), R.string.trackTime1.toString(), R.string.artworkUrl1.toString()),
+            Track(R.string.trackName2.toString(), R.string.artistName2.toString(), R.string.trackTime2.toString(), R.string.artworkUrl2.toString()),
+            Track(R.string.trackName3.toString(), R.string.artistName3.toString(), R.string.trackTime3.toString(), R.string.artworkUrl3.toString()),
+            Track(R.string.trackName4.toString(), R.string.artistName4.toString(), R.string.trackTime4.toString(), R.string.artworkUrl4.toString()),
+            Track(R.string.trackName5.toString(), R.string.artistName5.toString(), R.string.trackTime5.toString(), R.string.artworkUrl5.toString())
+        )
     }
 
 
