@@ -13,4 +13,5 @@
     <color name="backgroundSettingsScreen">#FFFFFFFF</color>
     <color name="textColorHint">#AEAFB4</color>
     <color name="drawableTint">#AEAFB4</color>
+    <color name="dotTint">#AEAFB4</color>
 </resources>
