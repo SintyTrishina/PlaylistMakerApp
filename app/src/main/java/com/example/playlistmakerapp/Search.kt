@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 
 class Search : AppCompatActivity() {
 
@@ -55,6 +56,44 @@ class Search : AppCompatActivity() {
             }
         }
         inputEditText.addTextChangedListener(textWatcher)
+
+
+        val trackAdapter = TrackAdapter(
+            listOf(
+                Track(
+                    getString(R.string.trackName1),
+                    getString(R.string.artistName1),
+                    getString(R.string.trackTime1),
+                    getString(R.string.artworkUrl1)
+                ),
+                Track(
+                    getString(R.string.trackName2),
+                    getString(R.string.artistName2),
+                    getString(R.string.trackTime2),
+                    getString(R.string.artworkUrl2)
+                ),
+                Track(
+                    getString(R.string.trackName3),
+                    getString(R.string.artistName3),
+                    getString(R.string.trackTime3),
+                    getString(R.string.artworkUrl3)
+                ),
+                Track(
+                    getString(R.string.trackName4),
+                    getString(R.string.artistName4),
+                    getString(R.string.trackTime4),
+                    getString(R.string.artworkUrl4)
+                ),
+                Track(
+                    getString(R.string.trackName5),
+                    getString(R.string.artistName5),
+                    getString(R.string.trackTime5),
+                    getString(R.string.artworkUrl5)
+                )
+            )
+        )
+        val trackRecyclerView = findViewById<RecyclerView>(R.id.trackRecyclerView)
+        trackRecyclerView.adapter = trackAdapter
     }
 
 

@@ -17,6 +17,16 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <style name="TrackStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textSize">11sp</item>
+        <item name="fontFamily">@font/ys_display_regular</item>
+    </style>
+
     <style name="TopText">
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">@dimen/textSize</item>

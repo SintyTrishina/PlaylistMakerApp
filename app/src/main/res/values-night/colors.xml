@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#1A1B22</color>
+    <color name="colorTrackName">#FFFFFFFF</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#3772E7</color>
     <color name="gray">#AEAFB4</color>
@@ -12,4 +13,5 @@
     <color name="backgroundSettingsScreen">#1A1B22</color>
     <color name="textColorHint">#1A1B22</color>
     <color name="drawableTint">#1A1B22</color>
+    <color name="dotTint">#FFFFFF</color>
 </resources>

@@ -65,17 +65,27 @@
 
         <ImageView
             android:id="@+id/clearIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/padding"
+            android:layout_height="@dimen/padding"
             android:layout_gravity="end"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="@dimen/imagePadding"
+            android:layout_marginBottom="10dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             android:visibility="gone"
             app:tint="@color/drawableTint" />
 
 
     </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/trackRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/padding"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/track_list" />
 
 
 </LinearLayout>
