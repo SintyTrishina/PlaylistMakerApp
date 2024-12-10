@@ -14,4 +14,8 @@
     <color name="textColorHint">#1A1B22</color>
     <color name="drawableTint">#1A1B22</color>
     <color name="dotTint">#FFFFFF</color>
+    <color name="error">#FFFFFF</color>
+    <color name="placeholderColor">#FFFFFF</color>
+    <color name="updateBackground">#FFFFFF</color>
+    <color name="updateText">#1A1B22</color>
 </resources>
