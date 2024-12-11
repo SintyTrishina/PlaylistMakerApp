@@ -4,8 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class TrackAdapter(private var tracks: ArrayList<Track>) : RecyclerView.Adapter<TrackViewHolder>() {
+class TrackAdapter : RecyclerView.Adapter<TrackViewHolder>() {
 
+    private var tracks: ArrayList<Track> = ArrayList()
     fun updateTracks(newTracks: ArrayList<Track>) {
         tracks.clear()
         tracks.addAll(newTracks)

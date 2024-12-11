@@ -42,13 +42,15 @@ class Search : AppCompatActivity() {
     private lateinit var updateButton: Button
     private val baseUrl = "https://itunes.apple.com"
     private var tracks = ArrayList<Track>()
-    private val trackAdapter = TrackAdapter(tracks)
+    private val trackAdapter = TrackAdapter()
+
 
     private val retrofit =
         Retrofit.Builder().baseUrl(baseUrl).addConverterFactory(GsonConverterFactory.create())
             .build()
 
     private val trackService = retrofit.create(TrackApi::class.java)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,12 +64,15 @@ class Search : AppCompatActivity() {
             trackAdapter.updateTracks(tracks)
         }
 
+
         inputEditText = findViewById(R.id.inputEditText)
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
         val buttonBack = findViewById<ImageView>(R.id.back)
         placeholderMessage = findViewById(R.id.placeholderMessage)
         placeholderImage = findViewById(R.id.placeholderImage)
         updateButton = findViewById(R.id.updateButton)
+        val trackRecyclerView = findViewById<RecyclerView>(R.id.trackRecyclerView)
+        trackRecyclerView.adapter = trackAdapter
 
         buttonBack.setOnClickListener {
             finish()
@@ -75,8 +80,11 @@ class Search : AppCompatActivity() {
 
         clearButton.setOnClickListener {
             tracks.clear()
-            trackAdapter.notifyDataSetChanged()
+            trackAdapter.updateTracks(tracks)
             inputEditText.setText("")
+            placeholderImage.visibility = View.GONE
+            updateButton.visibility = View.GONE
+            showMessage("", "")
 
             clearButton.visibility = View.GONE
             val inputMethodManager =
@@ -106,8 +114,7 @@ class Search : AppCompatActivity() {
             false
         }
 
-        val trackRecyclerView = findViewById<RecyclerView>(R.id.trackRecyclerView)
-        trackRecyclerView.adapter = trackAdapter
+
 
         updateButton.setOnClickListener {
             search()
@@ -128,7 +135,7 @@ class Search : AppCompatActivity() {
                                 placeholderImage.visibility = View.GONE
                                 updateButton.visibility = View.GONE
                                 tracks.addAll(response.body()?.results!!)
-                                trackAdapter.notifyDataSetChanged()
+                                trackAdapter.updateTracks(tracks)
                             }
                             if (tracks.isEmpty()) {
 
@@ -167,7 +174,7 @@ class Search : AppCompatActivity() {
         if (text.isNotEmpty()) {
             placeholderMessage.visibility = View.VISIBLE
             tracks.clear()
-            trackAdapter.notifyDataSetChanged()
+            trackAdapter.updateTracks(tracks)
             placeholderMessage.text = text
             if (additionalMessage.isNotEmpty()) {
                 Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
