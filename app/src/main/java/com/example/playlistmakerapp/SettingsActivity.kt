@@ -12,11 +12,32 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet.Layout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
+
+
+    override fun onPause() {
+        super.onPause()
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.switcher)
+        (applicationContext as App).switchTheme(themeSwitcher.isChecked)
+    }
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.switcher)
+
+        themeSwitcher.isChecked = (applicationContext as App).darkTheme
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+        }
+
+
+
 
         val buttonBack = findViewById<ImageView>(R.id.back)
 
@@ -57,9 +78,10 @@ class SettingsActivity : AppCompatActivity() {
 
         buttonAgreement.setOnClickListener {
             val agreementText = getString(R.string.agreementText)
-            val intent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(agreementText))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(agreementText))
             startActivity(intent)
         }
     }
+
+
 }
