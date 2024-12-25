@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 
-const val FILE_PREFERENCES = "file_preferences"
+const val THEME_SETTINGS = "theme_settings"
 const val SWITCH_KEY = "switch_key"
 
 class App : Application() {
@@ -16,10 +16,9 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        sharedPref = getSharedPreferences(FILE_PREFERENCES, MODE_PRIVATE)
+        sharedPref = getSharedPreferences(THEME_SETTINGS, MODE_PRIVATE)
         darkThemePrivate = sharedPref.getBoolean(SWITCH_KEY, false)
         switchTheme(darkTheme)
-
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {
@@ -34,7 +33,5 @@ class App : Application() {
         sharedPref.edit()
             .putBoolean(SWITCH_KEY, darkThemeEnabled)
             .apply()
-
-
     }
 }
