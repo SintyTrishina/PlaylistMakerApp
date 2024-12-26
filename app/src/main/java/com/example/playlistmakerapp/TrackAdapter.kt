@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class TrackAdapter : RecyclerView.Adapter<TrackViewHolder>() {
+class TrackAdapter(
+    private val onItemClickListener: (Track) -> Unit
+) : RecyclerView.Adapter<TrackViewHolder>() {
 
     private var tracks: ArrayList<Track> = ArrayList()
     private lateinit var searchHistory: SearchHistory
@@ -32,8 +34,7 @@ class TrackAdapter : RecyclerView.Adapter<TrackViewHolder>() {
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener {
-            val currentTrack = tracks[position]
-                searchHistory.addTrack(currentTrack) //нажимая на элемент ui добавляем трек в историю
+            onItemClickListener(tracks[position])
         }
     }
 }

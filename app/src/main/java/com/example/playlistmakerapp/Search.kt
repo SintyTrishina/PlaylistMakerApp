@@ -37,15 +37,9 @@ class Search : AppCompatActivity() {
     private lateinit var textSearch: TextView
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var searchHistory: SearchHistory
-    private val baseUrl = "https://itunes.apple.com"
     private var tracks = ArrayList<Track>()
     private lateinit var trackAdapter: TrackAdapter
-
-    private val retrofit =
-        Retrofit.Builder().baseUrl(baseUrl).addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-    private val trackService = retrofit.create(TrackApi::class.java)
+    private val trackService = RetrofitClient.trackService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,12 +60,13 @@ class Search : AppCompatActivity() {
         searchHistory = SearchHistory(sharedPrefs)
 
         //СОЗДАЕМ ЭКЗЕМПЛЯР АДАПТЕРА
-        trackAdapter = TrackAdapter()
+        trackAdapter = TrackAdapter() {
+            searchHistory.addTrack(it)
+        }
         //ПЕРЕДАЕМ АДАПТЕРУ SP
         trackAdapter.initSharedPrefs(sharedPrefs)
         trackRecyclerView.adapter = trackAdapter
         searchHistory.loadHistoryFromPrefs()
-        showSearchHistory()
 
         inputEditText.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus && inputEditText.text.isEmpty()) {
@@ -113,6 +108,11 @@ class Search : AppCompatActivity() {
                     showSearchHistory()
                 } else {
                     hideSearchHistory()
+                }
+
+                if (s.isNullOrEmpty()) {
+                    placeholderImage.visibility = View.GONE
+                    placeholderMessage.visibility = View.GONE
                 }
             }
 

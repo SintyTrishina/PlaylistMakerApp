@@ -11,7 +11,9 @@ class SearchHistory(private val sharedPrefs: SharedPreferences) {
     // Добавляем трек на самый верх
     fun addTrack(track: Track) {
         // Удаляем дубликаты из локального списка
-        searchList.removeIf { it.trackId == track.trackId }
+        if (searchList.contains(track)) {
+            searchList.remove(track)
+        }
 
         // Добавляем новый трек в начало списка
         searchList.add(0, track)
