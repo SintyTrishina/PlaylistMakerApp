@@ -40,10 +40,10 @@
         <item name="tint">@color/white</item>
     </style>
 
-    <style name="Switch">
-        <item name="android:thumbTint">@color/switch_thumb_color</item>
-        <item name="android:trackTint">@color/switch_track_color</item>
-    </style>
+<!--    <style name="Switch">-->
+<!--        <item name="android:thumbTint">@drawable/switch_thumb_color</item>-->
+<!--        <item name="android:trackTint">@drawable/switch_track_color</item>-->
+<!--    </style>-->
 
     <style name="SmallTextStyle">
         <item name="android:textColor">@color/white</item>
