@@ -20,9 +20,4 @@
     <string name="update">Обновить</string>
     <string name="searchHint">Вы искали</string>
     <string name="searchClean">Очистить историю</string>
-    <string name="duration">Длительность</string>
-    <string name="album">Альбом</string>
-    <string name="year">Год</string>
-    <string name="style">Жанр</string>
-    <string name="country">Страна</string>
 </resources>

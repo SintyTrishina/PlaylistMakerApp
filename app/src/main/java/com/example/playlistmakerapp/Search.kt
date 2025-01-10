@@ -63,8 +63,6 @@ class Search : AppCompatActivity() {
         //СОЗДАЕМ ЭКЗЕМПЛЯР АДАПТЕРА
         trackAdapter = TrackAdapter() {
             searchHistory.addTrack(it)
-            val intentAudioplayer = Intent(this, AudioPlayer::class.java)
-            startActivity(intentAudioplayer)
         }
         //ПЕРЕДАЕМ АДАПТЕРУ SP
         trackAdapter.initSharedPrefs(sharedPrefs)
