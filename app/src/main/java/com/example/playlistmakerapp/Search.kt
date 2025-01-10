@@ -1,6 +1,7 @@
 package com.example.playlistmakerapp
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
@@ -62,6 +63,8 @@ class Search : AppCompatActivity() {
         //СОЗДАЕМ ЭКЗЕМПЛЯР АДАПТЕРА
         trackAdapter = TrackAdapter() {
             searchHistory.addTrack(it)
+            val intentAudioplayer = Intent(this, AudioPlayer::class.java)
+            startActivity(intentAudioplayer)
         }
         //ПЕРЕДАЕМ АДАПТЕРУ SP
         trackAdapter.initSharedPrefs(sharedPrefs)

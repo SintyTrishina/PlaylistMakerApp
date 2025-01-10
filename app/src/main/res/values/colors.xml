@@ -18,4 +18,5 @@
     <color name="placeholderColor">#1A1B22</color>
     <color name="updateBackground">#1A1B22</color>
     <color name="updateText">#FFFFFFFF</color>
+    <color name="roundButton">#401A1B22</color>
 </resources>
