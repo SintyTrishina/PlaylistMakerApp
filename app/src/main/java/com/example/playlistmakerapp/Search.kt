@@ -61,9 +61,22 @@ class Search : AppCompatActivity() {
         searchHistory = SearchHistory(sharedPrefs)
 
         //СОЗДАЕМ ЭКЗЕМПЛЯР АДАПТЕРА
-        trackAdapter = TrackAdapter() {
-            searchHistory.addTrack(it)
+        trackAdapter = TrackAdapter { track ->
+            searchHistory.addTrack(track)
+            val intentAudioPlayerActivity = Intent(this, AudioPlayerActivity::class.java).apply {
+                putExtra("TRACK_ID", track.trackId)
+                putExtra("TRACK_NAME", track.trackName)
+                putExtra("ARTIST_NAME", track.artistName)
+                putExtra("COLLECTION_NAME", track.collectionName)
+                putExtra("RELEASE_DATE", track.releaseDate)
+                putExtra("PRIMARY_GENRE_NAME", track.primaryGenreName)
+                putExtra("COUNTRY", track.country)
+                putExtra("TRACK_TIME_MILLIS", track.trackTimeMillis)
+                putExtra("ART_WORK_URL", track.artworkUrl100)
+            }
+            startActivity(intentAudioPlayerActivity)
         }
+
         //ПЕРЕДАЕМ АДАПТЕРУ SP
         trackAdapter.initSharedPrefs(sharedPrefs)
         trackRecyclerView.adapter = trackAdapter
@@ -139,7 +152,7 @@ class Search : AppCompatActivity() {
     private fun search() {
         if (inputEditText.text.isNotEmpty()) {
 
-            trackService.search(inputEditText.text.toString())
+            trackService.search(term = inputEditText.text.toString())
                 .enqueue(object : Callback<TrackResponse> {
                     override fun onResponse(
                         call: Call<TrackResponse>, response: Response<TrackResponse>
@@ -252,7 +265,9 @@ class Search : AppCompatActivity() {
     companion object {
         const val USER_TEXT = "USER_TEXT"
         const val TRACK_LIST_KEY = "TRACK_LIST_KEY"
+
     }
+
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
