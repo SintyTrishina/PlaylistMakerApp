@@ -18,4 +18,6 @@
     <color name="placeholderColor">#FFFFFF</color>
     <color name="updateBackground">#FFFFFF</color>
     <color name="updateText">#1A1B22</color>
+    <color name="roundButton">#40FFFFFF</color>
+    <color name="arrowBack">#FFFFFF</color>
 </resources>

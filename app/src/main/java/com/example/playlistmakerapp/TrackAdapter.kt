@@ -32,9 +32,10 @@ class TrackAdapter(
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(tracks[position])
+        val track = tracks[position]
+        holder.bind(track)
         holder.itemView.setOnClickListener {
-            onItemClickListener(tracks[position])
+            onItemClickListener(track)
         }
     }
 }
