@@ -22,8 +22,6 @@ import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 const val SEARCH_HISTORY = "search_history"
 
@@ -64,15 +62,15 @@ class Search : AppCompatActivity() {
         trackAdapter = TrackAdapter { track ->
             searchHistory.addTrack(track)
             val intentAudioPlayerActivity = Intent(this, AudioPlayerActivity::class.java).apply {
-                putExtra("TRACK_ID", track.trackId)
-                putExtra("TRACK_NAME", track.trackName)
-                putExtra("ARTIST_NAME", track.artistName)
-                putExtra("COLLECTION_NAME", track.collectionName)
-                putExtra("RELEASE_DATE", track.releaseDate)
-                putExtra("PRIMARY_GENRE_NAME", track.primaryGenreName)
-                putExtra("COUNTRY", track.country)
-                putExtra("TRACK_TIME_MILLIS", track.trackTimeMillis)
-                putExtra("ART_WORK_URL", track.artworkUrl100)
+                putExtra(Constants.TRACK_ID, track.trackId)
+                putExtra(Constants.TRACK_NAME, track.trackName)
+                putExtra(Constants.ARTIST_NAME, track.artistName)
+                putExtra(Constants.COLLECTION_NAME, track.collectionName)
+                putExtra(Constants.RELEASE_DATE, track.releaseDate)
+                putExtra(Constants.PRIMARY_GENRE_NAME, track.primaryGenreName)
+                putExtra(Constants.COUNTRY, track.country)
+                putExtra(Constants.TRACK_TIME_MILLIS, track.trackTimeMillis)
+                putExtra(Constants.ART_WORK_URL, track.artworkUrl100)
             }
             startActivity(intentAudioPlayerActivity)
         }

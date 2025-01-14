@@ -6,10 +6,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.text.SimpleDateFormat
@@ -28,7 +25,6 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audio_player)
@@ -38,15 +34,15 @@ class AudioPlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        val trackId = intent.getIntExtra("TRACK_ID", 0)
-        val trackName = intent.getStringExtra("TRACK_NAME")
-        val artistName = intent.getStringExtra("ARTIST_NAME")
-        val collectionName = intent.getStringExtra("COLLECTION_NAME")
-        val releaseDate = intent.getStringExtra("RELEASE_DATE")
-        val primaryGenreName = intent.getStringExtra("PRIMARY_GENRE_NAME")
-        val country = intent.getStringExtra("COUNTRY")
-        val trackTimeMillis = intent.getLongExtra("TRACK_TIME_MILLIS", 0)
-        val artworkUrl100 = intent.getStringExtra("ART_WORK_URL")
+        val trackId = intent.getIntExtra(Constants.TRACK_ID, 0)
+        val trackName = intent.getStringExtra(Constants.TRACK_NAME)
+        val artistName = intent.getStringExtra(Constants.ARTIST_NAME)
+        val collectionName = intent.getStringExtra(Constants.COLLECTION_NAME)
+        val releaseDate = intent.getStringExtra(Constants.RELEASE_DATE)
+        val primaryGenreName = intent.getStringExtra(Constants.PRIMARY_GENRE_NAME)
+        val country = intent.getStringExtra(Constants.COUNTRY)
+        val trackTimeMillis = intent.getLongExtra(Constants.TRACK_TIME_MILLIS, 0)
+        val artworkUrl100 = intent.getStringExtra(Constants.ART_WORK_URL)
 
         val track = Track(
             trackId = trackId,
@@ -81,7 +77,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.country).text = track.country
 
         val cornerRadius = dpToPx(8f, this)
-        Glide.with(this)
+        Glide.with(artworkUrlView.context)
             .load(track.getCoverArtwork())
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.placeholder)
