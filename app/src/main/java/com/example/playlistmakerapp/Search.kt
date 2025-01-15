@@ -22,8 +22,6 @@ import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 const val SEARCH_HISTORY = "search_history"
 
@@ -61,9 +59,22 @@ class Search : AppCompatActivity() {
         searchHistory = SearchHistory(sharedPrefs)
 
         //СОЗДАЕМ ЭКЗЕМПЛЯР АДАПТЕРА
-        trackAdapter = TrackAdapter() {
-            searchHistory.addTrack(it)
+        trackAdapter = TrackAdapter { track ->
+            searchHistory.addTrack(track)
+            val intentAudioPlayerActivity = Intent(this, AudioPlayerActivity::class.java).apply {
+                putExtra(Constants.TRACK_ID, track.trackId)
+                putExtra(Constants.TRACK_NAME, track.trackName)
+                putExtra(Constants.ARTIST_NAME, track.artistName)
+                putExtra(Constants.COLLECTION_NAME, track.collectionName)
+                putExtra(Constants.RELEASE_DATE, track.releaseDate)
+                putExtra(Constants.PRIMARY_GENRE_NAME, track.primaryGenreName)
+                putExtra(Constants.COUNTRY, track.country)
+                putExtra(Constants.TRACK_TIME_MILLIS, track.trackTimeMillis)
+                putExtra(Constants.ART_WORK_URL, track.artworkUrl100)
+            }
+            startActivity(intentAudioPlayerActivity)
         }
+
         //ПЕРЕДАЕМ АДАПТЕРУ SP
         trackAdapter.initSharedPrefs(sharedPrefs)
         trackRecyclerView.adapter = trackAdapter
@@ -139,7 +150,7 @@ class Search : AppCompatActivity() {
     private fun search() {
         if (inputEditText.text.isNotEmpty()) {
 
-            trackService.search(inputEditText.text.toString())
+            trackService.search(term = inputEditText.text.toString())
                 .enqueue(object : Callback<TrackResponse> {
                     override fun onResponse(
                         call: Call<TrackResponse>, response: Response<TrackResponse>
@@ -252,7 +263,9 @@ class Search : AppCompatActivity() {
     companion object {
         const val USER_TEXT = "USER_TEXT"
         const val TRACK_LIST_KEY = "TRACK_LIST_KEY"
+
     }
+
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)

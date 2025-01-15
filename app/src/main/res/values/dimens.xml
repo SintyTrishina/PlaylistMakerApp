@@ -9,4 +9,6 @@
     <dimen name="dimenSize">48dp</dimen>
     <dimen name="imagePadding">12dp</dimen>
     <dimen name="textPadding">21dp</dimen>
+    <dimen name="imageSmallButtonDimen">51dp</dimen>
+    <dimen name="imageBigButtonDimen">100dp</dimen>
 </resources>
