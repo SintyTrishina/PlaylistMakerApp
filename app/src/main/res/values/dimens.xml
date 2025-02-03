@@ -11,4 +11,5 @@
     <dimen name="textPadding">21dp</dimen>
     <dimen name="imageSmallButtonDimen">51dp</dimen>
     <dimen name="imageBigButtonDimen">100dp</dimen>
+    <dimen name="progressBar">44dp</dimen>
 </resources>

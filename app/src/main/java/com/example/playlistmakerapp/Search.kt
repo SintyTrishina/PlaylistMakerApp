@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -12,6 +14,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -33,12 +36,16 @@ class Search : AppCompatActivity() {
     private lateinit var placeholderImage: ImageView
     private lateinit var updateButton: Button
     private lateinit var cleanSearchButton: Button
+    private lateinit var progressBar: ProgressBar
     private lateinit var textSearch: TextView
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var searchHistory: SearchHistory
     private var tracks = ArrayList<Track>()
     private lateinit var trackAdapter: TrackAdapter
     private val trackService = RetrofitClient.trackService
+
+    private val handler = Handler(Looper.getMainLooper())
+    private var isClickAllowed = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,26 +60,32 @@ class Search : AppCompatActivity() {
         val trackRecyclerView = findViewById<RecyclerView>(R.id.trackRecyclerView)
         cleanSearchButton = findViewById(R.id.searchHistoryCleanButton)
         textSearch = findViewById(R.id.searchHint)
+        progressBar = findViewById(R.id.progressBar)
+
 
         //СОЗДАЕМ ЭКЗЕМПЛЯР SP
         sharedPrefs = getSharedPreferences(SEARCH_HISTORY, MODE_PRIVATE)
         searchHistory = SearchHistory(sharedPrefs)
 
         //СОЗДАЕМ ЭКЗЕМПЛЯР АДАПТЕРА
-        trackAdapter = TrackAdapter { track ->
-            searchHistory.addTrack(track)
-            val intentAudioPlayerActivity = Intent(this, AudioPlayerActivity::class.java).apply {
-                putExtra(Constants.TRACK_ID, track.trackId)
-                putExtra(Constants.TRACK_NAME, track.trackName)
-                putExtra(Constants.ARTIST_NAME, track.artistName)
-                putExtra(Constants.COLLECTION_NAME, track.collectionName)
-                putExtra(Constants.RELEASE_DATE, track.releaseDate)
-                putExtra(Constants.PRIMARY_GENRE_NAME, track.primaryGenreName)
-                putExtra(Constants.COUNTRY, track.country)
-                putExtra(Constants.TRACK_TIME_MILLIS, track.trackTimeMillis)
-                putExtra(Constants.ART_WORK_URL, track.artworkUrl100)
+        trackAdapter = TrackAdapter {
+            if (clickDebounce()) {
+                searchHistory.addTrack(it)
+                val intentAudioPlayerActivity =
+                    Intent(this, AudioPlayerActivity::class.java).apply {
+                        putExtra(Constants.TRACK_ID, it.trackId)
+                        putExtra(Constants.TRACK_NAME, it.trackName)
+                        putExtra(Constants.ARTIST_NAME, it.artistName)
+                        putExtra(Constants.COLLECTION_NAME, it.collectionName)
+                        putExtra(Constants.RELEASE_DATE, it.releaseDate)
+                        putExtra(Constants.PRIMARY_GENRE_NAME, it.primaryGenreName)
+                        putExtra(Constants.COUNTRY, it.country)
+                        putExtra(Constants.TRACK_TIME_MILLIS, it.trackTimeMillis)
+                        putExtra(Constants.ART_WORK_URL, it.artworkUrl100)
+                        putExtra(Constants.PREVIEW_URL, it.previewUrl)
+                    }
+                startActivity(intentAudioPlayerActivity)
             }
-            startActivity(intentAudioPlayerActivity)
         }
 
         //ПЕРЕДАЕМ АДАПТЕРУ SP
@@ -116,6 +129,7 @@ class Search : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButton.isVisible = !s.isNullOrEmpty()
+                searchDebounce()
                 if (inputEditText.hasFocus() && s.isNullOrEmpty()) {
                     showSearchHistory()
                 } else {
@@ -135,26 +149,39 @@ class Search : AppCompatActivity() {
 
         inputEditText.addTextChangedListener(textWatcher)
 
-        inputEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                search()
-            }
-            false
-        }
 
         updateButton.setOnClickListener {
             search()
         }
     }
 
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private val searchRunnable = Runnable { search() }
+
     private fun search() {
         if (inputEditText.text.isNotEmpty()) {
+
+            progressBar.visibility = View.VISIBLE
 
             trackService.search(term = inputEditText.text.toString())
                 .enqueue(object : Callback<TrackResponse> {
                     override fun onResponse(
                         call: Call<TrackResponse>, response: Response<TrackResponse>
                     ) {
+                        progressBar.visibility = View.GONE
                         if (response.code() == 200) {
                             tracks.clear()
                             if (response.body()?.results?.isNotEmpty() == true) {
@@ -189,6 +216,7 @@ class Search : AppCompatActivity() {
                     }
 
                     override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                        progressBar.visibility = View.GONE
                         placeholderImage.setImageResource(R.drawable.errorconnection)
                         placeholderImage.visibility = View.VISIBLE
                         updateButton.visibility = View.VISIBLE
@@ -261,9 +289,10 @@ class Search : AppCompatActivity() {
     }
 
     companion object {
-        const val USER_TEXT = "USER_TEXT"
-        const val TRACK_LIST_KEY = "TRACK_LIST_KEY"
-
+        private const val USER_TEXT = "USER_TEXT"
+        private const val TRACK_LIST_KEY = "TRACK_LIST_KEY"
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 
 
