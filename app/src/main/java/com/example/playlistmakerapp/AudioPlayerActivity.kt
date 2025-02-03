@@ -1,9 +1,13 @@
 package com.example.playlistmakerapp
 
 import android.content.Context
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,15 +19,12 @@ import java.util.Locale
 class AudioPlayerActivity : AppCompatActivity() {
 
     private lateinit var buttonBack: ImageView
-
-    private fun dpToPx(dp: Float, context: Context): Int {
-        return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            dp,
-            context.resources.displayMetrics
-        ).toInt()
-    }
-
+    private lateinit var buttonPlay: ImageButton
+    private lateinit var timePlay: TextView
+    private var mediaPlayer = MediaPlayer()
+    private var playerState = STATE_DEFAULT
+    private var previewUrl: String? = null
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +44,8 @@ class AudioPlayerActivity : AppCompatActivity() {
         val country = intent.getStringExtra(Constants.COUNTRY)
         val trackTimeMillis = intent.getLongExtra(Constants.TRACK_TIME_MILLIS, 0)
         val artworkUrl100 = intent.getStringExtra(Constants.ART_WORK_URL)
+        previewUrl = intent.getStringExtra(Constants.PREVIEW_URL)
+
 
         val track = Track(
             trackId = trackId,
@@ -54,6 +57,7 @@ class AudioPlayerActivity : AppCompatActivity() {
             releaseDate = releaseDate ?: "",
             primaryGenreName = primaryGenreName ?: "",
             country = country ?: "",
+            previewUrl = previewUrl ?: "",
         )
 
 
@@ -84,5 +88,100 @@ class AudioPlayerActivity : AppCompatActivity() {
             .centerCrop()
             .transform(RoundedCorners(cornerRadius))
             .into(artworkUrlView)
+
+
+
+        buttonPlay = findViewById(R.id.buttonPlay)
+        buttonPlay.isEnabled = false
+        preparePlayer()
+
+        buttonPlay.setOnClickListener {
+            playbackControl()
+        }
+
+        timePlay = findViewById(R.id.timePlay)
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(updatingTime)
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(updatingTime)
+        mediaPlayer.release()
+    }
+
+    private fun dpToPx(dp: Float, context: Context): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp,
+            context.resources.displayMetrics
+        ).toInt()
+    }
+
+    private fun preparePlayer() {
+        mediaPlayer.setDataSource(previewUrl)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            buttonPlay.isEnabled = true
+            playerState = STATE_PREPARED
+        }
+        mediaPlayer.setOnCompletionListener {
+            playerState = STATE_PREPARED
+            buttonPlay.setImageResource(R.drawable.black_button)
+            handler.removeCallbacks(updatingTime)
+            timePlay.setText(R.string.timer)
+        }
+    }
+
+    private val updatingTime = object : Runnable {
+        override fun run() {
+            if (playerState == STATE_PLAYING) {
+                timePlay.text =
+                    SimpleDateFormat(
+                        "mm:ss",
+                        Locale.getDefault()
+                    ).format(mediaPlayer.currentPosition)
+                handler.postDelayed(this, UPDATE_TIME)
+            }
+        }
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        buttonPlay.setImageResource(R.drawable.pause_button)
+        playerState = STATE_PLAYING
+        handler.post(updatingTime)
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        buttonPlay.setImageResource(R.drawable.black_button)
+        playerState = STATE_PAUSED
+        handler.removeCallbacks(updatingTime)
+    }
+
+    private fun playbackControl() {
+        when (playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+        private const val UPDATE_TIME = 300L
     }
 }
