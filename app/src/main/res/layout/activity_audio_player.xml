@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    style="@style/ModeSettingsScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AudioPlayerActivity">
@@ -117,8 +118,7 @@
             android:src="@drawable/black_button"
             app:layout_constraintEnd_toStartOf="@id/buttonLike"
             app:layout_constraintStart_toEndOf="@id/buttonAdd"
-            app:layout_constraintTop_toBottomOf="@id/artistName"
-            />
+            app:layout_constraintTop_toBottomOf="@id/artistName" />
 
         <ImageButton
             android:id="@+id/buttonLike"
@@ -130,8 +130,7 @@
             app:layout_constraintEnd_toEndOf="@id/bigGuideRight"
             app:layout_constraintStart_toEndOf="@id/buttonPlay"
             app:layout_constraintTop_toBottomOf="@id/artistName"
-            app:tint="@color/white"
-            />
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/timePlay"

@@ -11,4 +11,7 @@ object Constants {
     const val TRACK_TIME_MILLIS = "TRACK_TIME_MILLIS"
     const val ART_WORK_URL = "ART_WORK_URL"
     const val PREVIEW_URL = "PREVIEW_URL"
+    const val THEME_SETTINGS = "theme_settings"
+    const val SWITCH_KEY = "switch_key"
+    const val BASE_URL = "https://itunes.apple.com"
 }

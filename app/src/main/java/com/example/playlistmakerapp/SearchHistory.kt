@@ -6,32 +6,25 @@ import com.google.gson.Gson
 const val maxSize = 10
 
 class SearchHistory(private val sharedPrefs: SharedPreferences) {
-    private val searchList = ArrayList<Track>() // Локальное хранилище
+    private val searchList = ArrayList<Track>()
 
-    // Добавляем трек на самый верх
     fun addTrack(track: Track) {
-        // Удаляем дубликаты из локального списка
         if (searchList.contains(track)) {
             searchList.remove(track)
         }
 
-        // Добавляем новый трек в начало списка
         searchList.add(0, track)
 
-        // Если список превышает максимальный размер, удаляем последний элемент
         if (searchList.size > maxSize) {
             val removedTrack = searchList.removeAt(searchList.size - 1)
-            // Удаляем трек из SharedPreferences
             sharedPrefs.edit()
                 .remove(removedTrack.trackId.toString())
                 .apply()
         }
 
-        // Сохраняем новый трек в SharedPreferences
         saveTrackToPrefs(track, System.currentTimeMillis())
     }
 
-    // Сохраняем трек в SharedPreferences
     private fun saveTrackToPrefs(track: Track, timestamp: Long) {
         val json = Gson().toJson(track)
         sharedPrefs.edit()
@@ -39,12 +32,10 @@ class SearchHistory(private val sharedPrefs: SharedPreferences) {
             .apply()
     }
 
-    // Получаем историю поиска
     fun getHistory(): ArrayList<Track> {
         return searchList
     }
 
-    // Очищаем локальное хранилище и SharedPreferences
     fun cleanHistory() {
         sharedPrefs.edit()
             .clear()
@@ -53,9 +44,8 @@ class SearchHistory(private val sharedPrefs: SharedPreferences) {
         searchList.clear()
     }
 
-    // Загружаем данные из SharedPreferences
     fun loadHistoryFromPrefs() {
-        searchList.clear() // Очищаем текущий список
+        searchList.clear()
 
         searchList.addAll(
             sharedPrefs.all.values.mapNotNull { value ->
@@ -66,11 +56,10 @@ class SearchHistory(private val sharedPrefs: SharedPreferences) {
                 } catch (e: Exception) {
                     null
                 }
-            }.sortedByDescending { it.first } // Сортируем по метке времени
-                .map { it.second } // Преобразуем в список треков
+            }.sortedByDescending { it.first }
+                .map { it.second }
         )
 
-        // Если список превышает maxSize, удаляем лишние треки
         while (searchList.size > maxSize) {
             val removedTrack = searchList.removeAt(searchList.size - 1)
             sharedPrefs.edit()

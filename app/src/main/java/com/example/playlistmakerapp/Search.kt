@@ -9,7 +9,6 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -25,8 +24,6 @@ import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
-const val SEARCH_HISTORY = "search_history"
 
 class Search : AppCompatActivity() {
 
@@ -63,11 +60,9 @@ class Search : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
 
 
-        //СОЗДАЕМ ЭКЗЕМПЛЯР SP
         sharedPrefs = getSharedPreferences(SEARCH_HISTORY, MODE_PRIVATE)
         searchHistory = SearchHistory(sharedPrefs)
 
-        //СОЗДАЕМ ЭКЗЕМПЛЯР АДАПТЕРА
         trackAdapter = TrackAdapter {
             if (clickDebounce()) {
                 searchHistory.addTrack(it)
@@ -88,12 +83,11 @@ class Search : AppCompatActivity() {
             }
         }
 
-        //ПЕРЕДАЕМ АДАПТЕРУ SP
         trackAdapter.initSharedPrefs(sharedPrefs)
         trackRecyclerView.adapter = trackAdapter
         searchHistory.loadHistoryFromPrefs()
 
-        inputEditText.setOnFocusChangeListener { view, hasFocus ->
+        inputEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && inputEditText.text.isEmpty()) {
                 showSearchHistory()
             } else {
@@ -293,6 +287,7 @@ class Search : AppCompatActivity() {
         private const val TRACK_LIST_KEY = "TRACK_LIST_KEY"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val SEARCH_HISTORY = "search_history"
     }
 
 
