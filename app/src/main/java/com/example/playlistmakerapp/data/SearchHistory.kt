@@ -1,6 +1,7 @@
-package com.example.playlistmakerapp
+package com.example.playlistmakerapp.data
 
 import android.content.SharedPreferences
+import com.example.playlistmakerapp.domain.models.Track
 import com.google.gson.Gson
 
 const val maxSize = 10

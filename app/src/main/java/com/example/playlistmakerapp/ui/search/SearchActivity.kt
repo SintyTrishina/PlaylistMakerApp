@@ -1,4 +1,4 @@
-package com.example.playlistmakerapp
+package com.example.playlistmakerapp.ui.search
 
 import android.content.Context
 import android.content.Intent
@@ -19,13 +19,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmakerapp.Constants
+import com.example.playlistmakerapp.R
+import com.example.playlistmakerapp.data.SearchHistory
+import com.example.playlistmakerapp.data.dto.TrackSearchResponse
+import com.example.playlistmakerapp.domain.models.Track
+import com.example.playlistmakerapp.ui.audio_player.AudioPlayerActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class Search : AppCompatActivity() {
+class SearchActivity : AppCompatActivity() {
 
     private var userText: String = ""
     private lateinit var inputEditText: EditText
@@ -171,9 +177,9 @@ class Search : AppCompatActivity() {
             progressBar.visibility = View.VISIBLE
 
             trackService.search(term = inputEditText.text.toString())
-                .enqueue(object : Callback<TrackResponse> {
+                .enqueue(object : Callback<TrackSearchResponse> {
                     override fun onResponse(
-                        call: Call<TrackResponse>, response: Response<TrackResponse>
+                        call: Call<TrackSearchResponse>, response: Response<TrackSearchResponse>
                     ) {
                         progressBar.visibility = View.GONE
                         if (response.code() == 200) {
@@ -209,7 +215,7 @@ class Search : AppCompatActivity() {
                         }
                     }
 
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<TrackSearchResponse>, t: Throwable) {
                         progressBar.visibility = View.GONE
                         placeholderImage.setImageResource(R.drawable.errorconnection)
                         placeholderImage.visibility = View.VISIBLE

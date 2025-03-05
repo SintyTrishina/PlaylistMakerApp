@@ -1,9 +1,12 @@
-package com.example.playlistmakerapp
+package com.example.playlistmakerapp.ui.search
 
 import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmakerapp.R
+import com.example.playlistmakerapp.data.SearchHistory
+import com.example.playlistmakerapp.domain.models.Track
 
 class TrackAdapter(
     private val onItemClickListener: (Track) -> Unit
