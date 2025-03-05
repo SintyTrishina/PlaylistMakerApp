@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmakerapp.R
-import com.example.playlistmakerapp.data.SearchHistory
 import com.example.playlistmakerapp.domain.models.Track
 
 class TrackAdapter(
@@ -13,14 +12,15 @@ class TrackAdapter(
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
     private var tracks: ArrayList<Track> = ArrayList()
-    private lateinit var searchHistory: SearchHistory
+//    private lateinit var searchHistoryRepository: SearchHistoryRepository
+//
+//    fun initSharedPrefs(sharedPrefs: SharedPreferences) {
+//        searchHistoryRepository = Creator.createSearchHistoryRepository(this)
+//    }
 
-    fun initSharedPrefs(sharedPrefs: SharedPreferences) {
-        searchHistory = SearchHistory(sharedPrefs)
-    }
-
-    fun updateTracks(newTracks: ArrayList<Track>) {
-        tracks = newTracks
+    fun updateTracks(tracks: List<Track>) {
+        this.tracks.clear()
+        this.tracks.addAll(tracks)
         notifyDataSetChanged()
     }
 

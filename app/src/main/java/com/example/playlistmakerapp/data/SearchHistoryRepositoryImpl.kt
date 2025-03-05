@@ -1,15 +1,15 @@
 package com.example.playlistmakerapp.data
 
 import android.content.SharedPreferences
+import com.example.playlistmakerapp.domain.api.SearchHistoryRepository
 import com.example.playlistmakerapp.domain.models.Track
 import com.google.gson.Gson
 
-const val maxSize = 10
-
-class SearchHistory(private val sharedPrefs: SharedPreferences) {
+class SearchHistoryRepositoryImpl(private val sharedPrefs: SharedPreferences) : SearchHistoryRepository {
     private val searchList = ArrayList<Track>()
+    private val maxSize = 10
 
-    fun addTrack(track: Track) {
+    override fun addTrack(track: Track) {
         if (searchList.contains(track)) {
             searchList.remove(track)
         }
@@ -26,18 +26,18 @@ class SearchHistory(private val sharedPrefs: SharedPreferences) {
         saveTrackToPrefs(track, System.currentTimeMillis())
     }
 
-    private fun saveTrackToPrefs(track: Track, timestamp: Long) {
+    override fun saveTrackToPrefs(track: Track, timestamp: Long) {
         val json = Gson().toJson(track)
         sharedPrefs.edit()
             .putString(track.trackId.toString(), "$timestamp|$json")
             .apply()
     }
 
-    fun getHistory(): ArrayList<Track> {
+    override fun getHistory(): ArrayList<Track> {
         return searchList
     }
 
-    fun cleanHistory() {
+    override fun cleanHistory() {
         sharedPrefs.edit()
             .clear()
             .apply()
@@ -45,7 +45,7 @@ class SearchHistory(private val sharedPrefs: SharedPreferences) {
         searchList.clear()
     }
 
-    fun loadHistoryFromPrefs() {
+    override fun loadHistoryFromPrefs() {
         searchList.clear()
 
         searchList.addAll(
