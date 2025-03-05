@@ -177,7 +177,7 @@ class SearchActivity : AppCompatActivity() {
                             progressBar.visibility = View.GONE
                             tracks.clear()
 
-                            if (data != null && data.isNotEmpty()) {
+                            if (!data.isNullOrEmpty()) {
                                 tracks.addAll(data)
                                 showTracks()
                                 updateUI(isEmpty = false, isError = false)

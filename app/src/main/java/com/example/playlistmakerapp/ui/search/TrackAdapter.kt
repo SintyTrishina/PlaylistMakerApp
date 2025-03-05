@@ -1,6 +1,5 @@
 package com.example.playlistmakerapp.ui.search
 
-import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,11 +11,6 @@ class TrackAdapter(
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
     private var tracks: ArrayList<Track> = ArrayList()
-//    private lateinit var searchHistoryRepository: SearchHistoryRepository
-//
-//    fun initSharedPrefs(sharedPrefs: SharedPreferences) {
-//        searchHistoryRepository = Creator.createSearchHistoryRepository(this)
-//    }
 
     fun updateTracks(tracks: List<Track>) {
         this.tracks.clear()
