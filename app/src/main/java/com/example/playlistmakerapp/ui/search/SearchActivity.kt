@@ -169,98 +169,115 @@ class SearchActivity : AppCompatActivity() {
         if (inputEditText.text.isNotEmpty()) {
             progressBar.visibility = View.VISIBLE
 
-            trackInteractor.search(inputEditText.text.toString(), object : TrackInteractor.TrackConsumer {
-                override fun consume(data: List<Track>?) {
-                    progressBar.visibility = View.GONE
-                    tracks.clear()
+            trackInteractor.search(
+                inputEditText.text.toString(),
+                object : TrackInteractor.TrackConsumer {
+                    override fun consume(data: List<Track>?) {
+                        handler.post {
+                            progressBar.visibility = View.GONE
+                            tracks.clear()
 
-                    if (data != null && data.isNotEmpty()) {
-                        tracks.addAll(data)
-                        showTracks()
-                        updateUI(isEmpty = false, isError = false)
-                    } else {
-                        updateUI(isEmpty = true, isError = false)
+                            if (data != null && data.isNotEmpty()) {
+                                tracks.addAll(data)
+                                showTracks()
+                                updateUI(isEmpty = false, isError = false)
+                            } else {
+                                updateUI(isEmpty = true, isError = false)
+                            }
+                        }
                     }
-                }
 
-                override fun onError(error: Throwable) {
-                    progressBar.visibility = View.GONE
-                    updateUI(isEmpty = false, isError = true)
-                    Log.e("SearchActivity", "Error during search: ${error.message}")
-                }
-            })
+                    override fun onError(error: Throwable) {
+                        handler.post {
+                            progressBar.visibility = View.GONE
+                            updateUI(isEmpty = false, isError = true)
+                            Log.e("SearchActivity", "Error during search: ${error.message}")
+                        }
+                    }
+                })
         }
     }
 
     private fun updateUI(isEmpty: Boolean, isError: Boolean) {
-        if (isEmpty) {
-            placeholderImage.setImageResource(R.drawable.error)
-            placeholderImage.visibility = View.VISIBLE
-            updateButton.visibility = View.GONE
-            textSearch.visibility = View.GONE
-            cleanSearchButton.visibility = View.GONE
-            showMessage(getString(R.string.nothing_found), "")
-        } else if (isError) {
-            placeholderImage.setImageResource(R.drawable.errorconnection)
-            placeholderImage.visibility = View.VISIBLE
-            updateButton.visibility = View.VISIBLE
-            textSearch.visibility = View.GONE
-            cleanSearchButton.visibility = View.GONE
-            showMessage(getString(R.string.something_went_wrong), "")
-        } else {
-            placeholderImage.visibility = View.GONE
-            updateButton.visibility = View.GONE
-            textSearch.visibility = View.GONE
-            cleanSearchButton.visibility = View.GONE
-            showMessage("", "")
+        handler.post {
+            if (isEmpty) {
+                placeholderImage.setImageResource(R.drawable.error)
+                placeholderImage.visibility = View.VISIBLE
+                updateButton.visibility = View.GONE
+                textSearch.visibility = View.GONE
+                cleanSearchButton.visibility = View.GONE
+                showMessage(getString(R.string.nothing_found), "")
+            } else if (isError) {
+                placeholderImage.setImageResource(R.drawable.errorconnection)
+                placeholderImage.visibility = View.VISIBLE
+                updateButton.visibility = View.VISIBLE
+                textSearch.visibility = View.GONE
+                cleanSearchButton.visibility = View.GONE
+                showMessage(getString(R.string.something_went_wrong), "")
+            } else {
+                placeholderImage.visibility = View.GONE
+                updateButton.visibility = View.GONE
+                textSearch.visibility = View.GONE
+                cleanSearchButton.visibility = View.GONE
+                showMessage("", "")
+            }
         }
     }
 
 
     private fun showMessage(text: String, additionalMessage: String) {
-        if (text.isNotEmpty()) {
-            placeholderMessage.visibility = View.VISIBLE
-            tracks.clear()
-            trackAdapter.updateTracks(tracks)
-            placeholderMessage.text = text
-            if (additionalMessage.isNotEmpty()) {
-                Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
+        handler.post {
+            if (text.isNotEmpty()) {
+                placeholderMessage.visibility = View.VISIBLE
+                tracks.clear()
+                trackAdapter.updateTracks(tracks)
+                placeholderMessage.text = text
+                if (additionalMessage.isNotEmpty()) {
+                    Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
+                }
+            } else {
+                placeholderMessage.visibility = View.GONE
             }
-        } else {
-            placeholderMessage.visibility = View.GONE
         }
     }
 
     private fun showSearchHistory() {
-        val history = searchHistoryInteractor.getHistory()
-        if (history.isNotEmpty()) {
-            textSearch.visibility = View.VISIBLE
-            cleanSearchButton.visibility = View.VISIBLE
-            placeholderImage.visibility = View.GONE
-            updateButton.visibility = View.GONE
-            trackAdapter.updateTracks(history)
-        } else {
-            hideSearchHistory()
+        handler.post {
+            val history = searchHistoryInteractor.getHistory()
+            if (history.isNotEmpty()) {
+                textSearch.visibility = View.VISIBLE
+                cleanSearchButton.visibility = View.VISIBLE
+                placeholderImage.visibility = View.GONE
+                updateButton.visibility = View.GONE
+                trackAdapter.updateTracks(history)
+            } else {
+                hideSearchHistory()
+            }
         }
     }
 
     private fun hideSearchHistory() {
-        textSearch.visibility = View.GONE
-        cleanSearchButton.visibility = View.GONE
-        placeholderImage.visibility = View.GONE
-        updateButton.visibility = View.GONE
-        placeholderMessage.visibility = View.GONE
-        trackAdapter.updateTracks(ArrayList())
-    }
-
-    private fun showTracks() {
-        if (tracks.isNotEmpty()) {
-            trackAdapter.updateTracks(tracks)
+        handler.post {
             textSearch.visibility = View.GONE
             cleanSearchButton.visibility = View.GONE
             placeholderImage.visibility = View.GONE
-            placeholderMessage.visibility = View.GONE
             updateButton.visibility = View.GONE
+            placeholderMessage.visibility = View.GONE
+            trackAdapter.updateTracks(ArrayList())
+        }
+    }
+
+
+    private fun showTracks() {
+        handler.post {
+            if (tracks.isNotEmpty()) {
+                trackAdapter.updateTracks(tracks)
+                textSearch.visibility = View.GONE
+                cleanSearchButton.visibility = View.GONE
+                placeholderImage.visibility = View.GONE
+                placeholderMessage.visibility = View.GONE
+                updateButton.visibility = View.GONE
+            }
         }
     }
 
