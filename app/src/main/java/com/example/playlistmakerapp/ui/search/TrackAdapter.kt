@@ -1,23 +1,20 @@
-package com.example.playlistmakerapp
+package com.example.playlistmakerapp.ui.search
 
-import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmakerapp.R
+import com.example.playlistmakerapp.domain.models.Track
 
 class TrackAdapter(
     private val onItemClickListener: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
     private var tracks: ArrayList<Track> = ArrayList()
-    private lateinit var searchHistory: SearchHistory
 
-    fun initSharedPrefs(sharedPrefs: SharedPreferences) {
-        searchHistory = SearchHistory(sharedPrefs)
-    }
-
-    fun updateTracks(newTracks: ArrayList<Track>) {
-        tracks = newTracks
+    fun updateTracks(tracks: List<Track>) {
+        this.tracks.clear()
+        this.tracks.addAll(tracks)
         notifyDataSetChanged()
     }
 

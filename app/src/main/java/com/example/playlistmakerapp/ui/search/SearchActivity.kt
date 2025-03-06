@@ -1,15 +1,14 @@
-package com.example.playlistmakerapp
+package com.example.playlistmakerapp.ui.search
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -20,15 +19,17 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmakerapp.Constants
+import com.example.playlistmakerapp.R
+import com.example.playlistmakerapp.creator.Creator
+import com.example.playlistmakerapp.domain.api.SearchHistoryInteractor
+import com.example.playlistmakerapp.domain.api.TrackInteractor
+import com.example.playlistmakerapp.domain.models.Track
+import com.example.playlistmakerapp.ui.audio_player.AudioPlayerActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-const val SEARCH_HISTORY = "search_history"
-
-class Search : AppCompatActivity() {
+class SearchActivity : AppCompatActivity() {
 
     private var userText: String = ""
     private lateinit var inputEditText: EditText
@@ -38,11 +39,10 @@ class Search : AppCompatActivity() {
     private lateinit var cleanSearchButton: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var textSearch: TextView
-    private lateinit var sharedPrefs: SharedPreferences
-    private lateinit var searchHistory: SearchHistory
     private var tracks = ArrayList<Track>()
     private lateinit var trackAdapter: TrackAdapter
-    private val trackService = RetrofitClient.trackService
+    private lateinit var searchHistoryInteractor: SearchHistoryInteractor
+    private val trackInteractor = Creator.provideTrackInteractor()
 
     private val handler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
@@ -62,15 +62,11 @@ class Search : AppCompatActivity() {
         textSearch = findViewById(R.id.searchHint)
         progressBar = findViewById(R.id.progressBar)
 
+        searchHistoryInteractor = Creator.provideSearchHistoryInteractor(this)
 
-        //СОЗДАЕМ ЭКЗЕМПЛЯР SP
-        sharedPrefs = getSharedPreferences(SEARCH_HISTORY, MODE_PRIVATE)
-        searchHistory = SearchHistory(sharedPrefs)
-
-        //СОЗДАЕМ ЭКЗЕМПЛЯР АДАПТЕРА
         trackAdapter = TrackAdapter {
             if (clickDebounce()) {
-                searchHistory.addTrack(it)
+                searchHistoryInteractor.addTrack(it)
                 val intentAudioPlayerActivity =
                     Intent(this, AudioPlayerActivity::class.java).apply {
                         putExtra(Constants.TRACK_ID, it.trackId)
@@ -88,12 +84,10 @@ class Search : AppCompatActivity() {
             }
         }
 
-        //ПЕРЕДАЕМ АДАПТЕРУ SP
-        trackAdapter.initSharedPrefs(sharedPrefs)
         trackRecyclerView.adapter = trackAdapter
-        searchHistory.loadHistoryFromPrefs()
+        searchHistoryInteractor.loadHistoryFromPrefs()
 
-        inputEditText.setOnFocusChangeListener { view, hasFocus ->
+        inputEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && inputEditText.text.isEmpty()) {
                 showSearchHistory()
             } else {
@@ -106,14 +100,14 @@ class Search : AppCompatActivity() {
         }
 
         cleanSearchButton.setOnClickListener {
-            searchHistory.cleanHistory()
+            searchHistoryInteractor.cleanHistory()
             hideSearchHistory()
         }
 
         clearButton.setOnClickListener {
             tracks.clear()
             inputEditText.setText("")
-            searchHistory.loadHistoryFromPrefs()
+            searchHistoryInteractor.loadHistoryFromPrefs()
             showSearchHistory()
             showMessage("", "")
 
@@ -173,107 +167,117 @@ class Search : AppCompatActivity() {
 
     private fun search() {
         if (inputEditText.text.isNotEmpty()) {
-
             progressBar.visibility = View.VISIBLE
 
-            trackService.search(term = inputEditText.text.toString())
-                .enqueue(object : Callback<TrackResponse> {
-                    override fun onResponse(
-                        call: Call<TrackResponse>, response: Response<TrackResponse>
-                    ) {
-                        progressBar.visibility = View.GONE
-                        if (response.code() == 200) {
+            trackInteractor.search(
+                inputEditText.text.toString(),
+                object : TrackInteractor.TrackConsumer {
+                    override fun consume(data: List<Track>?) {
+                        handler.post {
+                            progressBar.visibility = View.GONE
                             tracks.clear()
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                tracks.addAll(response.body()?.results!!)
-                                showTracks()
-                            }
-                            if (tracks.isEmpty()) {
 
-                                placeholderImage.setImageResource(R.drawable.error)
-                                placeholderImage.visibility = View.VISIBLE
-                                updateButton.visibility = View.GONE
-                                textSearch.visibility = View.GONE
-                                cleanSearchButton.visibility = View.GONE
-                                showMessage(getString(R.string.nothing_found), "")
+                            if (!data.isNullOrEmpty()) {
+                                tracks.addAll(data)
+                                showTracks()
+                                updateUI(isEmpty = false, isError = false)
                             } else {
-                                placeholderImage.visibility = View.GONE
-                                updateButton.visibility = View.GONE
-                                textSearch.visibility = View.GONE
-                                cleanSearchButton.visibility = View.GONE
-                                showMessage("", "")
+                                updateUI(isEmpty = true, isError = false)
                             }
-                        } else {
-                            placeholderImage.setImageResource(R.drawable.errorconnection)
-                            placeholderImage.visibility = View.VISIBLE
-                            updateButton.visibility = View.VISIBLE
-                            textSearch.visibility = View.GONE
-                            cleanSearchButton.visibility = View.GONE
-                            showMessage(
-                                getString(R.string.something_went_wrong), response.code().toString()
-                            )
                         }
                     }
 
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                        progressBar.visibility = View.GONE
-                        placeholderImage.setImageResource(R.drawable.errorconnection)
-                        placeholderImage.visibility = View.VISIBLE
-                        updateButton.visibility = View.VISIBLE
-                        textSearch.visibility = View.GONE
-                        cleanSearchButton.visibility = View.GONE
-                        showMessage(
-                            getString(R.string.something_went_wrong), t.message.toString()
-                        )
+                    override fun onError(error: Throwable) {
+                        handler.post {
+                            progressBar.visibility = View.GONE
+                            updateUI(isEmpty = false, isError = true)
+                            Log.e("SearchActivity", "Error during search: ${error.message}")
+                        }
                     }
                 })
         }
     }
 
-    private fun showMessage(text: String, additionalMessage: String) {
-        if (text.isNotEmpty()) {
-            placeholderMessage.visibility = View.VISIBLE
-            tracks.clear()
-            trackAdapter.updateTracks(tracks)
-            placeholderMessage.text = text
-            if (additionalMessage.isNotEmpty()) {
-                Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
+    private fun updateUI(isEmpty: Boolean, isError: Boolean) {
+        handler.post {
+            if (isEmpty) {
+                placeholderImage.setImageResource(R.drawable.error)
+                placeholderImage.visibility = View.VISIBLE
+                updateButton.visibility = View.GONE
+                textSearch.visibility = View.GONE
+                cleanSearchButton.visibility = View.GONE
+                showMessage(getString(R.string.nothing_found), "")
+            } else if (isError) {
+                placeholderImage.setImageResource(R.drawable.errorconnection)
+                placeholderImage.visibility = View.VISIBLE
+                updateButton.visibility = View.VISIBLE
+                textSearch.visibility = View.GONE
+                cleanSearchButton.visibility = View.GONE
+                showMessage(getString(R.string.something_went_wrong), "")
+            } else {
+                placeholderImage.visibility = View.GONE
+                updateButton.visibility = View.GONE
+                textSearch.visibility = View.GONE
+                cleanSearchButton.visibility = View.GONE
+                showMessage("", "")
             }
-        } else {
-            placeholderMessage.visibility = View.GONE
+        }
+    }
+
+
+    private fun showMessage(text: String, additionalMessage: String) {
+        handler.post {
+            if (text.isNotEmpty()) {
+                placeholderMessage.visibility = View.VISIBLE
+                tracks.clear()
+                trackAdapter.updateTracks(tracks)
+                placeholderMessage.text = text
+                if (additionalMessage.isNotEmpty()) {
+                    Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
+                }
+            } else {
+                placeholderMessage.visibility = View.GONE
+            }
         }
     }
 
     private fun showSearchHistory() {
-        val history = searchHistory.getHistory()
-        if (history.isNotEmpty()) {
-            textSearch.visibility = View.VISIBLE
-            cleanSearchButton.visibility = View.VISIBLE
-            placeholderImage.visibility = View.GONE
-            updateButton.visibility = View.GONE
-            trackAdapter.updateTracks(history)
-        } else {
-            hideSearchHistory()
+        handler.post {
+            val history = searchHistoryInteractor.getHistory()
+            if (history.isNotEmpty()) {
+                textSearch.visibility = View.VISIBLE
+                cleanSearchButton.visibility = View.VISIBLE
+                placeholderImage.visibility = View.GONE
+                updateButton.visibility = View.GONE
+                trackAdapter.updateTracks(history)
+            } else {
+                hideSearchHistory()
+            }
         }
     }
 
     private fun hideSearchHistory() {
-        textSearch.visibility = View.GONE
-        cleanSearchButton.visibility = View.GONE
-        placeholderImage.visibility = View.GONE
-        updateButton.visibility = View.GONE
-        placeholderMessage.visibility = View.GONE
-        trackAdapter.updateTracks(ArrayList())
-    }
-
-    private fun showTracks() {
-        if (tracks.isNotEmpty()) {
-            trackAdapter.updateTracks(tracks)
+        handler.post {
             textSearch.visibility = View.GONE
             cleanSearchButton.visibility = View.GONE
             placeholderImage.visibility = View.GONE
-            placeholderMessage.visibility = View.GONE
             updateButton.visibility = View.GONE
+            placeholderMessage.visibility = View.GONE
+            trackAdapter.updateTracks(ArrayList())
+        }
+    }
+
+
+    private fun showTracks() {
+        handler.post {
+            if (tracks.isNotEmpty()) {
+                trackAdapter.updateTracks(tracks)
+                textSearch.visibility = View.GONE
+                cleanSearchButton.visibility = View.GONE
+                placeholderImage.visibility = View.GONE
+                placeholderMessage.visibility = View.GONE
+                updateButton.visibility = View.GONE
+            }
         }
     }
 
@@ -285,7 +289,7 @@ class Search : AppCompatActivity() {
         val json = Gson().toJson(tracks)
         outState.putString(TRACK_LIST_KEY, json)
 
-        searchHistory.getHistory()
+        searchHistoryInteractor.getHistory()
     }
 
     companion object {
@@ -307,7 +311,7 @@ class Search : AppCompatActivity() {
         tracks = Gson().fromJson(json, type)
         trackAdapter.updateTracks(tracks)
 
-        searchHistory.loadHistoryFromPrefs()
+        searchHistoryInteractor.loadHistoryFromPrefs()
         showSearchHistory()
     }
 }

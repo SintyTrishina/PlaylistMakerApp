@@ -2,11 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/ModeSettingsScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backgroundSettingsScreen"
     android:orientation="vertical"
-    tools:context=".Search">
+    tools:context=".ui.search.SearchActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
