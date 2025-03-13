@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmakerapp.Constants
+import com.example.playlistmakerapp.ui.Constants
 import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.domain.models.Track
 import java.text.SimpleDateFormat

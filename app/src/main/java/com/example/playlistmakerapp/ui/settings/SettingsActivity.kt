@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.playlistmakerapp.ui.App
+import com.example.playlistmakerapp.ui.app.App
 import com.example.playlistmakerapp.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 

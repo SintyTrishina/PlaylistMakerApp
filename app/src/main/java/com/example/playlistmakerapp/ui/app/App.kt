@@ -1,9 +1,9 @@
-package com.example.playlistmakerapp.ui
+package com.example.playlistmakerapp.ui.app
 
 import android.app.Application
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmakerapp.Constants
+import com.example.playlistmakerapp.ui.Constants
 
 class App : Application() {
 

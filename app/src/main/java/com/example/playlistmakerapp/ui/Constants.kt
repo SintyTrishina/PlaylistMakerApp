@@ -1,4 +1,4 @@
-package com.example.playlistmakerapp
+package com.example.playlistmakerapp.ui
 
 object Constants {
     const val TRACK_ID = "TRACK_ID"

@@ -10,13 +10,7 @@ class TrackAdapter(
     private val onItemClickListener: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
-    private var tracks: ArrayList<Track> = ArrayList()
-
-    fun updateTracks(tracks: List<Track>) {
-        this.tracks.clear()
-        this.tracks.addAll(tracks)
-        notifyDataSetChanged()
-    }
+    var tracks: ArrayList<Track> = ArrayList()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
