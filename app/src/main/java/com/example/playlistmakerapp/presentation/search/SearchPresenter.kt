@@ -13,9 +13,20 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class SearchPresenter(
-    private val view: SearchView,
     private val context: Context
 ) {
+
+    private var view: SearchView? = null
+    private var state: SearchState? = null
+
+    fun attachView(view: SearchView) {
+        this.view = view
+        state?.let { view.render(it) }
+    }
+
+    fun detachView() {
+        this.view = null
+    }
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
@@ -48,7 +59,7 @@ class SearchPresenter(
     // Обработка нажатия на трек
     fun onTrackClicked(track: Track) {
         searchHistoryInteractor.addTrack(track)
-        view.navigateToAudioPlayer(track)
+        view?.navigateToAudioPlayer(track)
     }
 
     // Обработка изменения фокуса поиска
@@ -62,7 +73,7 @@ class SearchPresenter(
 
     // Обработка нажатия на кнопку очистки поиска
     fun onClearButtonClicked() {
-        view.render(SearchState.Content(tracks))
+        renderState(SearchState.Content(tracks))
         showSearchHistory()
     }
 
@@ -78,6 +89,10 @@ class SearchPresenter(
     }
 
     fun searchDebounce(changedText: String) {
+        if (lastSearchText == changedText) {
+            return
+        }
+
         this.lastSearchText = changedText
         handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
@@ -86,7 +101,7 @@ class SearchPresenter(
 
     fun search(newSearchText: String) {
         if (newSearchText.isNotEmpty()) {
-            view.render(SearchState.Loading)
+            renderState(SearchState.Loading)
 
             trackInteractor.search(
                 newSearchText,
@@ -98,13 +113,13 @@ class SearchPresenter(
 
                             if (!data.isNullOrEmpty()) {
                                 tracks.addAll(data)
-                                view.render(SearchState.Content(tracks))
+                                renderState(SearchState.Content(tracks))
                             } else {
-                                view.render(SearchState.Empty(context.getString(R.string.nothing_found)))
+                                renderState(SearchState.Empty(context.getString(R.string.nothing_found)))
                             }
                             if (errorMessage != null) {
-                                view.render(SearchState.Error(context.getString(R.string.something_went_wrong)))
-                                view.showToast(errorMessage)
+                                renderState(SearchState.Error(context.getString(R.string.something_went_wrong)))
+                                view?.showToast(errorMessage)
 
                             }
                         }
@@ -113,28 +128,18 @@ class SearchPresenter(
         }
     }
 
+    private fun renderState(state: SearchState) {
+        this.state = state
+        this.view?.render(state)
+    }
 
-//    fun showMessage(text: String, additionalMessage: String) {
-//        handler.post {
-//            if (text.isNotEmpty()) {
-//                view.showPlaceholderMessage(true)
-//                tracks.clear()
-//                view.updateTracks(tracks)
-//                view.changePlaceholderText(text)
-//                if (additionalMessage.isNotEmpty()) {
-//                    view.showToast(additionalMessage)
-//                }
-//            } else {
-//                view.showPlaceholderMessage(false)
-//            }
-//        }
-//    }
+
 
     fun showSearchHistory() {
         handler.post {
             val history = searchHistoryInteractor.getHistory()
             if (history.isNotEmpty()) {
-                view.render(SearchState.History(history))
+                renderState(SearchState.History(history))
             } else {
                 hideSearchHistory()
             }
@@ -143,7 +148,7 @@ class SearchPresenter(
 
     fun hideSearchHistory() {
         handler.post {
-            view.render(SearchState.Content(ArrayList()))
+            renderState(SearchState.Content(ArrayList()))
         }
     }
 
@@ -166,7 +171,7 @@ class SearchPresenter(
         tracks = Gson().fromJson(json, type)
 
         if (tracks.isNotEmpty()) {
-            view.render(SearchState.Content(tracks))
+            view?.render(SearchState.Content(tracks))
         } else {
             showSearchHistory()
         }

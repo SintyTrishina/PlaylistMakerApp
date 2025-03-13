@@ -1,5 +1,6 @@
 package com.example.playlistmakerapp.ui.search
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -23,12 +24,19 @@ import com.example.playlistmakerapp.domain.models.Track
 import com.example.playlistmakerapp.presentation.search.SearchPresenter
 import com.example.playlistmakerapp.presentation.search.SearchView
 import com.example.playlistmakerapp.ui.Constants
+import com.example.playlistmakerapp.ui.app.App
 import com.example.playlistmakerapp.ui.audio_player.AudioPlayerActivity
 import com.example.playlistmakerapp.ui.search.models.SearchState
 import com.example.playlistmakerapp.util.Creator
 
 class SearchActivity : AppCompatActivity(), SearchView {
 
+    companion object {
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+
+    }
+
+    private var searchPresenter: SearchPresenter? = null
     private var userText = ""
     private lateinit var inputEditText: EditText
     private lateinit var placeholderMessage: TextView
@@ -41,14 +49,23 @@ class SearchActivity : AppCompatActivity(), SearchView {
 
     private val trackAdapter = TrackAdapter {
         if (clickDebounce()) {
-            searchPresenter.onTrackClicked(it)
+            searchPresenter?.onTrackClicked(it)
         }
     }
 
     private val handler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
-    private lateinit var searchPresenter: SearchPresenter
     private var textWatcher: TextWatcher? = null
+
+    override fun onStart() {
+        super.onStart()
+        searchPresenter?.attachView(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        searchPresenter?.attachView(this)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,8 +74,16 @@ class SearchActivity : AppCompatActivity(), SearchView {
         initViews()
         setupListeners()
 
-        searchPresenter = Creator.provideSearchPresenter(this, this)
-        searchPresenter.onCreate()
+        searchPresenter = (this.applicationContext as? App)?.searchPresenter
+
+        if (searchPresenter == null) {
+            searchPresenter = Creator.provideSearchPresenter(
+                this.applicationContext
+            )
+            (this.applicationContext as? App)?.searchPresenter = searchPresenter
+        }
+        searchPresenter?.onCreate()
+
     }
 
     private fun initViews() {
@@ -69,7 +94,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         cleanSearchButton = findViewById(R.id.searchHistoryCleanButton)
         textSearch = findViewById(R.id.searchHint)
         progressBar = findViewById(R.id.progressBar)
-        clearButton = findViewById<ImageView>(R.id.clearIcon)
+        clearButton = findViewById(R.id.clearIcon)
 
         val trackRecyclerView = findViewById<RecyclerView>(R.id.trackRecyclerView)
         trackRecyclerView.adapter = trackAdapter
@@ -78,7 +103,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
     private fun setupListeners() {
 
         inputEditText.setOnFocusChangeListener { _, hasFocus ->
-            searchPresenter.onSearchFocusChanged(hasFocus)
+            searchPresenter?.onSearchFocusChanged(hasFocus)
         }
 
         findViewById<ImageView>(R.id.back).setOnClickListener {
@@ -86,12 +111,12 @@ class SearchActivity : AppCompatActivity(), SearchView {
         }
 
         clearButton.setOnClickListener {
-            searchPresenter.onClearButtonClicked()
+            searchPresenter?.onClearButtonClicked()
 //            tracks.clear()
             inputEditText.setText("")
 //            searchHistoryInteractor.loadHistoryFromPrefs()
-//            searchPresenter.showSearchHistory()
-//            searchPresenter.showMessage("", "")
+//            searchPresenter?.showSearchHistory()
+//            searchPresenter?.showMessage("", "")
 //
             clearButton.visibility = View.GONE
             val inputMethodManager =
@@ -100,20 +125,20 @@ class SearchActivity : AppCompatActivity(), SearchView {
         }
 
         cleanSearchButton.setOnClickListener {
-            searchPresenter.onCleanHistoryClicked()
+            searchPresenter?.onCleanHistoryClicked()
 //            searchHistoryInteractor.cleanHistory()
-//            searchPresenter.hideSearchHistory()
+//            searchPresenter?.hideSearchHistory()
         }
         textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
                 clearButton.isVisible = !s.isNullOrEmpty()
-                searchPresenter.searchDebounce(changedText = s?.toString() ?: "")
+                searchPresenter?.searchDebounce(changedText = s?.toString() ?: "")
                 if (inputEditText.hasFocus() && s.isNullOrEmpty()) {
-                    searchPresenter.showSearchHistory()
+                    searchPresenter?.showSearchHistory()
                 } else {
-                    searchPresenter.hideSearchHistory()
+                    searchPresenter?.hideSearchHistory()
                 }
 
                 if (s.isNullOrEmpty()) {
@@ -129,8 +154,8 @@ class SearchActivity : AppCompatActivity(), SearchView {
         textWatcher?.let { inputEditText.addTextChangedListener(it) }
 
         updateButton.setOnClickListener {
-            searchPresenter.onUpdateButtonClicked()
-//            searchPresenter.search()
+            searchPresenter?.onUpdateButtonClicked()
+//            searchPresenter?.search()
         }
     }
 
@@ -144,25 +169,38 @@ class SearchActivity : AppCompatActivity(), SearchView {
         return current
     }
 
+    override fun onPause() {
+        super.onPause()
+        searchPresenter?.detachView()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        searchPresenter?.detachView()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         textWatcher?.let { inputEditText.removeTextChangedListener(it) }
-        searchPresenter.onDestroy()
+        searchPresenter?.detachView()
+        searchPresenter?.onDestroy()
+
+        if (isFinishing()) {
+            // Очищаем ссылку на Presenter в Application
+            (this.application as? App)?.searchPresenter = null
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        searchPresenter.onSaveInstanceState(outState)
-    }
-
-    companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        searchPresenter?.onSaveInstanceState(outState)
+        searchPresenter?.detachView()
     }
 
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        searchPresenter.onRestoreInstanceState(savedInstanceState)
+        searchPresenter?.onRestoreInstanceState(savedInstanceState)
     }
 
     override fun showToast(message: String) {
@@ -179,7 +217,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         }
     }
 
-    fun showLoading() {
+    private fun showLoading() {
         progressBar.visibility = View.VISIBLE
         placeholderImage.visibility = View.GONE
         updateButton.visibility = View.GONE
@@ -188,7 +226,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         placeholderMessage.visibility = View.GONE
     }
 
-    fun showError(errorMessage: String) {
+    private fun showError(errorMessage: String) {
         progressBar.visibility = View.GONE
         placeholderImage.setImageResource(R.drawable.errorconnection)
         placeholderImage.visibility = View.VISIBLE
@@ -200,7 +238,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
 
     }
 
-    fun showEmpty(emptyMessage: String) {
+    private fun showEmpty(emptyMessage: String) {
         progressBar.visibility = View.GONE
         placeholderImage.setImageResource(R.drawable.error)
         placeholderImage.visibility = View.VISIBLE
@@ -211,7 +249,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         placeholderMessage.text = emptyMessage
     }
 
-    fun showContent(tracks: List<Track>) {
+    private fun showContent(tracks: List<Track>) {
         progressBar.visibility = View.GONE
         placeholderImage.visibility = View.GONE
         updateButton.visibility = View.GONE
@@ -224,7 +262,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
 
     }
 
-    fun showHistory(history: List<Track>) {
+    private fun showHistory(history: List<Track>) {
         progressBar.visibility = View.GONE
         placeholderImage.visibility = View.GONE
         updateButton.visibility = View.GONE
