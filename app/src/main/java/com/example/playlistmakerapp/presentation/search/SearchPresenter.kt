@@ -11,22 +11,11 @@ import com.example.playlistmakerapp.ui.search.models.SearchState
 import com.example.playlistmakerapp.util.Creator
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import moxy.MvpPresenter
 
 class SearchPresenter(
     private val context: Context
-) {
-
-    private var view: SearchView? = null
-    private var state: SearchState? = null
-
-    fun attachView(view: SearchView) {
-        this.view = view
-        state?.let { view.render(it) }
-    }
-
-    fun detachView() {
-        this.view = null
-    }
+): MvpPresenter<SearchView>() {
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
@@ -52,14 +41,14 @@ class SearchPresenter(
         showSearchHistory()
     }
 
-    fun onDestroy() {
+    override fun onDestroy() {
         handler.removeCallbacks(searchRunnable)
     }
 
     // Обработка нажатия на трек
     fun onTrackClicked(track: Track) {
         searchHistoryInteractor.addTrack(track)
-        view?.navigateToAudioPlayer(track)
+        viewState.navigateToAudioPlayer(track)
     }
 
     // Обработка изменения фокуса поиска
@@ -119,7 +108,7 @@ class SearchPresenter(
                             }
                             if (errorMessage != null) {
                                 renderState(SearchState.Error(context.getString(R.string.something_went_wrong)))
-                                view?.showToast(errorMessage)
+                                viewState.showToast(errorMessage)
 
                             }
                         }
@@ -129,8 +118,7 @@ class SearchPresenter(
     }
 
     private fun renderState(state: SearchState) {
-        this.state = state
-        this.view?.render(state)
+        viewState.render(state)
     }
 
 
@@ -171,7 +159,7 @@ class SearchPresenter(
         tracks = Gson().fromJson(json, type)
 
         if (tracks.isNotEmpty()) {
-            view?.render(SearchState.Content(tracks))
+            viewState.render(SearchState.Content(tracks))
         } else {
             showSearchHistory()
         }

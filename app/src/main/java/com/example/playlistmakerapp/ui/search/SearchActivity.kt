@@ -1,6 +1,5 @@
 package com.example.playlistmakerapp.ui.search
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -16,7 +15,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmakerapp.R
@@ -24,19 +22,30 @@ import com.example.playlistmakerapp.domain.models.Track
 import com.example.playlistmakerapp.presentation.search.SearchPresenter
 import com.example.playlistmakerapp.presentation.search.SearchView
 import com.example.playlistmakerapp.ui.Constants
-import com.example.playlistmakerapp.ui.app.App
 import com.example.playlistmakerapp.ui.audio_player.AudioPlayerActivity
 import com.example.playlistmakerapp.ui.search.models.SearchState
 import com.example.playlistmakerapp.util.Creator
+import moxy.MvpAppCompatActivity
+import moxy.presenter.InjectPresenter
+import moxy.presenter.ProvidePresenter
 
-class SearchActivity : AppCompatActivity(), SearchView {
+class SearchActivity : MvpAppCompatActivity(), SearchView {
 
     companion object {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
 
     }
 
-    private var searchPresenter: SearchPresenter? = null
+    @InjectPresenter
+    lateinit var searchPresenter: SearchPresenter
+
+    @ProvidePresenter
+    fun providePresenter(): SearchPresenter {
+        return Creator.provideSearchPresenter(
+            context = this.applicationContext,
+        )
+    }
+
     private var userText = ""
     private lateinit var inputEditText: EditText
     private lateinit var placeholderMessage: TextView
@@ -49,23 +58,13 @@ class SearchActivity : AppCompatActivity(), SearchView {
 
     private val trackAdapter = TrackAdapter {
         if (clickDebounce()) {
-            searchPresenter?.onTrackClicked(it)
+            searchPresenter.onTrackClicked(it)
         }
     }
 
     private val handler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
     private var textWatcher: TextWatcher? = null
-
-    override fun onStart() {
-        super.onStart()
-        searchPresenter?.attachView(this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        searchPresenter?.attachView(this)
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,15 +73,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         initViews()
         setupListeners()
 
-        searchPresenter = (this.applicationContext as? App)?.searchPresenter
-
-        if (searchPresenter == null) {
-            searchPresenter = Creator.provideSearchPresenter(
-                this.applicationContext
-            )
-            (this.applicationContext as? App)?.searchPresenter = searchPresenter
-        }
-        searchPresenter?.onCreate()
+        searchPresenter.onCreate()
 
     }
 
@@ -103,7 +94,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
     private fun setupListeners() {
 
         inputEditText.setOnFocusChangeListener { _, hasFocus ->
-            searchPresenter?.onSearchFocusChanged(hasFocus)
+            searchPresenter.onSearchFocusChanged(hasFocus)
         }
 
         findViewById<ImageView>(R.id.back).setOnClickListener {
@@ -111,7 +102,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         }
 
         clearButton.setOnClickListener {
-            searchPresenter?.onClearButtonClicked()
+            searchPresenter.onClearButtonClicked()
 //            tracks.clear()
             inputEditText.setText("")
 //            searchHistoryInteractor.loadHistoryFromPrefs()
@@ -125,7 +116,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         }
 
         cleanSearchButton.setOnClickListener {
-            searchPresenter?.onCleanHistoryClicked()
+            searchPresenter.onCleanHistoryClicked()
 //            searchHistoryInteractor.cleanHistory()
 //            searchPresenter?.hideSearchHistory()
         }
@@ -134,11 +125,11 @@ class SearchActivity : AppCompatActivity(), SearchView {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
                 clearButton.isVisible = !s.isNullOrEmpty()
-                searchPresenter?.searchDebounce(changedText = s?.toString() ?: "")
+                searchPresenter.searchDebounce(changedText = s?.toString() ?: "")
                 if (inputEditText.hasFocus() && s.isNullOrEmpty()) {
-                    searchPresenter?.showSearchHistory()
+                    searchPresenter.showSearchHistory()
                 } else {
-                    searchPresenter?.hideSearchHistory()
+                    searchPresenter.hideSearchHistory()
                 }
 
                 if (s.isNullOrEmpty()) {
@@ -154,7 +145,7 @@ class SearchActivity : AppCompatActivity(), SearchView {
         textWatcher?.let { inputEditText.addTextChangedListener(it) }
 
         updateButton.setOnClickListener {
-            searchPresenter?.onUpdateButtonClicked()
+            searchPresenter.onUpdateButtonClicked()
 //            searchPresenter?.search()
         }
     }
@@ -169,38 +160,23 @@ class SearchActivity : AppCompatActivity(), SearchView {
         return current
     }
 
-    override fun onPause() {
-        super.onPause()
-        searchPresenter?.detachView()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        searchPresenter?.detachView()
-    }
 
     override fun onDestroy() {
         super.onDestroy()
         textWatcher?.let { inputEditText.removeTextChangedListener(it) }
-        searchPresenter?.detachView()
-        searchPresenter?.onDestroy()
+        searchPresenter.onDestroy()
 
-        if (isFinishing()) {
-            // Очищаем ссылку на Presenter в Application
-            (this.application as? App)?.searchPresenter = null
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        searchPresenter?.onSaveInstanceState(outState)
-        searchPresenter?.detachView()
+        searchPresenter.onSaveInstanceState(outState)
     }
 
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        searchPresenter?.onRestoreInstanceState(savedInstanceState)
+        searchPresenter.onRestoreInstanceState(savedInstanceState)
     }
 
     override fun showToast(message: String) {
