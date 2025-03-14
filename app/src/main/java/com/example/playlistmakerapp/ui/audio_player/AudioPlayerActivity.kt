@@ -7,23 +7,19 @@ import android.os.Handler
 import android.os.Looper
 import android.util.TypedValue
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmakerapp.ui.Constants
 import com.example.playlistmakerapp.R
+import com.example.playlistmakerapp.databinding.ActivityAudioPlayerBinding
 import com.example.playlistmakerapp.domain.models.Track
+import com.example.playlistmakerapp.ui.Constants
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private lateinit var buttonBack: ImageView
-    private lateinit var buttonPlay: ImageButton
-    private lateinit var timePlay: TextView
+    private lateinit var binding: ActivityAudioPlayerBinding
     private var mediaPlayer = MediaPlayer()
     private var playerState = STATE_DEFAULT
     private var previewUrl: String? = null
@@ -31,10 +27,10 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_audio_player)
+        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        buttonBack = findViewById(R.id.back)
-        buttonBack.setOnClickListener {
+        binding.back.setOnClickListener {
             finish()
         }
 
@@ -63,46 +59,40 @@ class AudioPlayerActivity : AppCompatActivity() {
             previewUrl = previewUrl ?: "",
         )
 
+        binding.trackName.text = track.trackName
+        binding.artistName.text = track.artistName
 
-        val artworkUrlView = findViewById<ImageView>(R.id.imageMusic)
-        findViewById<TextView>(R.id.trackName).text = track.trackName
-        findViewById<TextView>(R.id.artistName).text = track.artistName
         val dateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
         val formattedTime = dateFormat.format(track.trackTimeMillis)
-        findViewById<TextView>(R.id.trackTime).text = formattedTime
+        binding.trackTime.text = formattedTime
 
-        val collectionNameView = findViewById<TextView>(R.id.collectionName)
         if (collectionName == null) {
-            collectionNameView.visibility = View.GONE
+            binding.collectionName.visibility = View.GONE
         }
-        collectionNameView.text = track.collectionName
+        binding.collectionName.text = track.collectionName
 
         val year = releaseDate?.substring(0, 4)
-        findViewById<TextView>(R.id.releaseDate).text = year
+        binding.releaseDate.text = year
 
-        findViewById<TextView>(R.id.primaryGenreName).text = track.primaryGenreName
-        findViewById<TextView>(R.id.country).text = track.country
+        binding.primaryGenreName.text = track.primaryGenreName
+        binding.country.text = track.country
 
         val cornerRadius = dpToPx(8f, this)
-        Glide.with(artworkUrlView.context)
+        Glide.with(binding.imageMusic.context)
             .load(track.getCoverArtwork())
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.placeholder)
             .centerCrop()
             .transform(RoundedCorners(cornerRadius))
-            .into(artworkUrlView)
+            .into(binding.imageMusic)
 
 
-
-        buttonPlay = findViewById(R.id.buttonPlay)
-        buttonPlay.isEnabled = false
+        binding.buttonPlay.isEnabled = false
         preparePlayer()
 
-        buttonPlay.setOnClickListener {
+        binding.buttonPlay.setOnClickListener {
             playbackControl()
         }
-
-        timePlay = findViewById(R.id.timePlay)
 
     }
 
@@ -130,21 +120,21 @@ class AudioPlayerActivity : AppCompatActivity() {
         mediaPlayer.setDataSource(previewUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            buttonPlay.isEnabled = true
+            binding.buttonPlay.isEnabled = true
             playerState = STATE_PREPARED
         }
         mediaPlayer.setOnCompletionListener {
             playerState = STATE_PREPARED
-            buttonPlay.setImageResource(R.drawable.black_button)
+            binding.buttonPlay.setImageResource(R.drawable.black_button)
             handler.removeCallbacks(updatingTime)
-            timePlay.setText(R.string.timer)
+            binding.timePlay.setText(R.string.timer)
         }
     }
 
     private val updatingTime = object : Runnable {
         override fun run() {
             if (playerState == STATE_PLAYING) {
-                timePlay.text =
+                binding.timePlay.text =
                     SimpleDateFormat(
                         "mm:ss",
                         Locale.getDefault()
@@ -156,14 +146,14 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     private fun startPlayer() {
         mediaPlayer.start()
-        buttonPlay.setImageResource(R.drawable.pause_button)
+        binding.buttonPlay.setImageResource(R.drawable.pause_button)
         playerState = STATE_PLAYING
         handler.post(updatingTime)
     }
 
     private fun pausePlayer() {
         mediaPlayer.pause()
-        buttonPlay.setImageResource(R.drawable.black_button)
+        binding.buttonPlay.setImageResource(R.drawable.black_button)
         playerState = STATE_PAUSED
         handler.removeCallbacks(updatingTime)
     }

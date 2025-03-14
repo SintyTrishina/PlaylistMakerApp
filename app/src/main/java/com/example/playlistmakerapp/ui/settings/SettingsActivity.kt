@@ -3,41 +3,37 @@ package com.example.playlistmakerapp.ui.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.FrameLayout
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.playlistmakerapp.ui.app.App
 import com.example.playlistmakerapp.R
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.example.playlistmakerapp.databinding.ActivitySettingsBinding
+import com.example.playlistmakerapp.ui.app.App
 
 class SettingsActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivitySettingsBinding
+
     override fun onPause() {
         super.onPause()
-        val themeSwitcher = findViewById<SwitchMaterial>(R.id.switcher)
-        (applicationContext as App).switchTheme(themeSwitcher.isChecked)
+        (applicationContext as App).switchTheme(binding.switcher.isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
 
-        val themeSwitcher = findViewById<SwitchMaterial>(R.id.switcher)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        themeSwitcher.isChecked = (applicationContext as App).darkTheme
-        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+        binding.switcher.isChecked = (applicationContext as App).darkTheme
+        binding.switcher.setOnCheckedChangeListener { _, checked ->
             (applicationContext as App).switchTheme(checked)
         }
 
-        val buttonBack = findViewById<ImageView>(R.id.back)
 
-        buttonBack.setOnClickListener {
+        binding.back.setOnClickListener {
             finish()
         }
 
-        val buttonShare = findViewById<FrameLayout>(R.id.buttonShare)
-
-        buttonShare.setOnClickListener {
+        binding.buttonShare.setOnClickListener {
             val message = getString(R.string.shareText)
             val shareTitle = getString(R.string.shareTitle)
             val intent = Intent(Intent.ACTION_SEND)
@@ -48,9 +44,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent.createChooser(intent, shareTitle))
         }
 
-        val buttonSupport = findViewById<FrameLayout>(R.id.buttonSupport)
-
-        buttonSupport.setOnClickListener {
+        binding.buttonSupport.setOnClickListener {
             val extraSubject = getString(R.string.extraSubject)
             val extraText = getString(R.string.extraText)
             val sendTitle = getString(R.string.sendTitle)
@@ -64,9 +58,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent.createChooser(intent, sendTitle))
         }
 
-        val buttonAgreement = findViewById<FrameLayout>(R.id.buttonAgreement)
-
-        buttonAgreement.setOnClickListener {
+        binding.buttonAgreement.setOnClickListener {
             val agreementText = getString(R.string.agreementText)
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(agreementText)))
         }

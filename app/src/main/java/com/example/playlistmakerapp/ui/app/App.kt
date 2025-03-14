@@ -3,16 +3,13 @@ package com.example.playlistmakerapp.ui.app
 import android.app.Application
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmakerapp.presentation.search.SearchPresenter
 import com.example.playlistmakerapp.ui.Constants
 
 class App : Application() {
 
-    var searchPresenter: SearchPresenter? = null
-
     private lateinit var sharedPref: SharedPreferences
     private var darkThemePrivate = false
-    val darkTheme:Boolean
+    val darkTheme: Boolean
         get() = darkThemePrivate
 
     override fun onCreate() {

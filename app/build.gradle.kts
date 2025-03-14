@@ -8,6 +8,10 @@ android {
     namespace = "com.example.playlistmakerapp"
     compileSdk = 35
 
+    viewBinding {
+        enable = true
+    }
+
     defaultConfig {
         applicationId = "com.example.playlistmakerapp"
         minSdk = 29
