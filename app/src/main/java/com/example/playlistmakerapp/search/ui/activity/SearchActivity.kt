@@ -15,7 +15,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.ActivitySearchBinding
-import com.example.playlistmakerapp.player.ui.AudioPlayerActivity
+import com.example.playlistmakerapp.player.ui.activity.AudioPlayerActivity
 import com.example.playlistmakerapp.search.domain.models.Track
 import com.example.playlistmakerapp.search.ui.SearchState
 import com.example.playlistmakerapp.search.ui.TrackAdapter
