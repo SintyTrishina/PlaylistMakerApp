@@ -9,7 +9,7 @@
     android:paddingHorizontal="@dimen/padding"
     android:paddingTop="14dp"
     android:paddingBottom="28dp"
-    tools:context=".ui.main_screen.MainActivity">
+    tools:context=".main.ui.MainActivity">
 
 
     <FrameLayout

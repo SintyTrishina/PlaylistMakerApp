@@ -1,20 +1,23 @@
 package com.example.playlistmakerapp.util
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.playlistmakerapp.data.SearchHistoryRepositoryImpl
-import com.example.playlistmakerapp.data.TrackRepositoryImpl
-import com.example.playlistmakerapp.data.network.RetrofitNetworkClient
-import com.example.playlistmakerapp.domain.api.SearchHistoryInteractor
-import com.example.playlistmakerapp.domain.api.SearchHistoryRepository
-import com.example.playlistmakerapp.domain.api.TrackInteractor
-import com.example.playlistmakerapp.domain.api.TrackRepository
-import com.example.playlistmakerapp.domain.impl.SearchHistoryInteractorImpl
-import com.example.playlistmakerapp.domain.impl.TrackInteractorImpl
-import com.example.playlistmakerapp.presentation.search.SearchPresenter
-import com.example.playlistmakerapp.presentation.search.SearchView
-import com.example.playlistmakerapp.ui.search.TrackAdapter
+import com.example.playlistmakerapp.search.data.SearchHistoryRepositoryImpl
+import com.example.playlistmakerapp.search.data.TrackRepositoryImpl
+import com.example.playlistmakerapp.search.data.network.RetrofitNetworkClient
+import com.example.playlistmakerapp.search.domain.api.SearchHistoryInteractor
+import com.example.playlistmakerapp.search.domain.api.SearchHistoryRepository
+import com.example.playlistmakerapp.search.domain.api.TrackInteractor
+import com.example.playlistmakerapp.search.domain.api.TrackRepository
+import com.example.playlistmakerapp.search.domain.impl.SearchHistoryInteractorImpl
+import com.example.playlistmakerapp.search.domain.impl.TrackInteractorImpl
+import com.example.playlistmakerapp.settings.data.impl.SettingsRepositoryImpl
+import com.example.playlistmakerapp.settings.domain.api.SettingsRepository
+import com.example.playlistmakerapp.settings.ui.viewmodel.SettingsViewModel
+import com.example.playlistmakerapp.sharing.data.impl.ExternalNavigatorImpl
+import com.example.playlistmakerapp.sharing.domain.api.ExternalNavigator
+import com.example.playlistmakerapp.sharing.domain.api.SharingInteractor
+import com.example.playlistmakerapp.sharing.domain.impl.SharingInteractorImpl
 
 object Creator {
 
@@ -39,10 +42,24 @@ object Creator {
         val repository = createSearchHistoryRepository(context)
         return SearchHistoryInteractorImpl(repository)
     }
+    private lateinit var applicationContext: Context
 
-    fun provideSearchPresenter(
-        context: Context
-    ): SearchPresenter {
-        return SearchPresenter(context)
+    fun initialize(context: Context) {
+        applicationContext = context
     }
+
+     fun provideSettingsRepository(): SettingsRepository {
+        return SettingsRepositoryImpl(applicationContext)
+    }
+
+    private fun provideExternalNavigator(context: Context): ExternalNavigator {
+        return ExternalNavigatorImpl(context)
+    }
+
+     fun provideSharingInteractor(context: Context): SharingInteractor {
+        return SharingInteractorImpl(provideExternalNavigator(context), context)
+    }
+
+
+
 }
