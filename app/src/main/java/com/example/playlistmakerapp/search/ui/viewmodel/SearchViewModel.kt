@@ -31,13 +31,13 @@ class SearchViewModel(
     private val _navigateToPlayer = SingleLiveEvent<Track>()
     val navigateToPlayer: LiveData<Track> get() = _navigateToPlayer
 
-    private var tracks = ArrayList<Track>()
+    private val _tracks = MutableLiveData<List<Track>>()
+    val tracks: LiveData<List<Track>> get() = _tracks
+
     private var lastSearchText: String? = null
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val USER_TEXT = "USER_TEXT"
-        private const val TRACK_LIST_KEY = "TRACK_LIST_KEY"
 
         fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
             initializer {
@@ -85,7 +85,7 @@ class SearchViewModel(
 
     // Обработка нажатия на кнопку очистки поиска
     fun onClearButtonClicked() {
-        renderState(SearchState.Content(tracks))
+        _tracks.value = emptyList()
         showSearchHistory()
     }
 
@@ -120,11 +120,11 @@ class SearchViewModel(
                 object : TrackInteractor.TrackConsumer {
                     override fun consume(data: List<Track>?, errorMessage: String?) {
 
-                        tracks.clear()
+                        _tracks.postValue(emptyList())
 
                         if (!data.isNullOrEmpty()) {
-                            tracks.addAll(data)
-                            renderState(SearchState.Content(tracks))
+                            _tracks.postValue(data)
+                            renderState(SearchState.Content(data))
                         } else {
                             renderState(SearchState.Empty(getApplication<Application>().getString(R.string.nothing_found)))
                         }

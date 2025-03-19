@@ -57,6 +57,10 @@ class SearchActivity : AppCompatActivity() {
         viewModel.searchState.observe(this) {
             render(it)
         }
+        viewModel.tracks.observe(this) {
+            // Обновляем UI с новым списком треков
+            showContent(it)
+        }
         viewModel.toastState.observe(this) {
             showToast(it)
         }
@@ -146,17 +150,6 @@ class SearchActivity : AppCompatActivity() {
         textWatcher?.let { binding.inputEditText.removeTextChangedListener(it) }
 
 
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-//        viewModel.onSaveInstanceState(outState)
-    }
-
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-//        viewModel.onRestoreInstanceState(savedInstanceState)
     }
 
     private fun showToast(message: String) {

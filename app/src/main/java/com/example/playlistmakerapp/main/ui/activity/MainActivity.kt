@@ -1,32 +1,37 @@
-package com.example.playlistmakerapp.main.ui
+package com.example.playlistmakerapp.main.ui.activity
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmakerapp.databinding.ActivityMainBinding
-import com.example.playlistmakerapp.media.ui.MediaActivity
-import com.example.playlistmakerapp.search.ui.activity.SearchActivity
-import com.example.playlistmakerapp.settings.ui.activity.SettingsActivity
+import com.example.playlistmakerapp.main.ui.viewmodel.MainViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        viewModel = ViewModelProvider(
+            this,
+            MainViewModel.getViewModelFactory(this)
+        )[MainViewModel::class.java]
+
         binding.button1.setOnClickListener {
-            startActivity(Intent(this, SearchActivity::class.java))
+            viewModel.startSearch()
         }
 
         binding.button2.setOnClickListener {
-            startActivity(Intent(this, MediaActivity::class.java))
+            viewModel.startMedia()
         }
 
         binding.button3.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+            viewModel.startSettings()
         }
     }
 }

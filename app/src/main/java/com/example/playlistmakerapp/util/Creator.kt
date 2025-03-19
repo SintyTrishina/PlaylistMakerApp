@@ -2,6 +2,8 @@ package com.example.playlistmakerapp.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.playlistmakerapp.main.data.impl.InternalNavigationImpl
+import com.example.playlistmakerapp.main.domain.api.InternalNavigation
 import com.example.playlistmakerapp.search.data.SearchHistoryRepositoryImpl
 import com.example.playlistmakerapp.search.data.TrackRepositoryImpl
 import com.example.playlistmakerapp.search.data.network.RetrofitNetworkClient
@@ -58,6 +60,10 @@ object Creator {
 
      fun provideSharingInteractor(context: Context): SharingInteractor {
         return SharingInteractorImpl(provideExternalNavigator(context), context)
+    }
+
+    fun provideInternalNavigator(context: Context): InternalNavigation {
+        return InternalNavigationImpl(context)
     }
 
 
