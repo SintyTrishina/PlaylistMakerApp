@@ -7,12 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmakerapp.settings.domain.api.SettingsRepository
+import com.example.playlistmakerapp.settings.domain.api.SettingsInteractor
 import com.example.playlistmakerapp.sharing.domain.api.SharingInteractor
 import com.example.playlistmakerapp.util.Creator
 
 class SettingsViewModel(
-    private val settingsRepository: SettingsRepository,
+    private val settingsInteractor: SettingsInteractor,
     private val sharingInteractor: SharingInteractor
 ) : ViewModel() {
 
@@ -22,7 +22,7 @@ class SettingsViewModel(
 
     init {
         // Загружаем текущее состояние темы при инициализации ViewModel
-        _darkThemeEnabled.value = settingsRepository.isDarkThemeEnabled()
+        _darkThemeEnabled.value = settingsInteractor.isDarkThemeEnabled()
     }
 
     companion object {
@@ -31,7 +31,7 @@ class SettingsViewModel(
             initializer {
 
                 SettingsViewModel(
-                    Creator.provideSettingsRepository(),
+                    Creator.provideSettingsInteractor(),
                     Creator.provideSharingInteractor(context)
                 )
             }
@@ -39,12 +39,12 @@ class SettingsViewModel(
     }
 
     fun switchTheme(isDarkTheme: Boolean) {
-        settingsRepository.switchTheme(isDarkTheme)
+        settingsInteractor.switchTheme(isDarkTheme)
         _darkThemeEnabled.value = isDarkTheme
     }
 
     fun isDarkThemeEnabled(): Boolean {
-        return settingsRepository.isDarkThemeEnabled()
+        return settingsInteractor.isDarkThemeEnabled()
     }
 
     fun shareApp() {

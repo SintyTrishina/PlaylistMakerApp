@@ -51,16 +51,16 @@ class SearchActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.trackRecyclerView.adapter = trackAdapter
-        viewModel = ViewModelProvider(this, SearchViewModel.getViewModelFactory())[SearchViewModel::class.java]
+        viewModel = ViewModelProvider(
+            this,
+            SearchViewModel.getViewModelFactory(this)
+        )[SearchViewModel::class.java]
 
         setupListeners()
         viewModel.searchState.observe(this) {
             render(it)
         }
-        viewModel.tracks.observe(this) {
-            // Обновляем UI с новым списком треков
-            showContent(it)
-        }
+
         viewModel.toastState.observe(this) {
             showToast(it)
         }

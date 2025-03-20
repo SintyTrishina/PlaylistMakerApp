@@ -12,30 +12,19 @@ import java.util.Locale
 class AudioPlayerViewModel : ViewModel() {
 
     companion object {
-        const val STATE_DEFAULT = 0
-        const val STATE_PREPARED = 1
-        const val STATE_PLAYING = 2
-        const val STATE_PAUSED = 3
         const val UPDATE_TIME = 300L
     }
 
     private var mediaPlayer = MediaPlayer()
     private val handler = Handler(Looper.getMainLooper())
 
-    private val _playerState = MutableLiveData<Int>()
-    val playerState: LiveData<Int> get() = _playerState
-
-    private val _currentPosition = MutableLiveData<String>()
-    val currentPosition: LiveData<String> get() = _currentPosition
-
-    private val _isPlayButtonEnabled = MutableLiveData<Boolean>()
-    val isPlayButtonEnabled: LiveData<Boolean> get() = _isPlayButtonEnabled
+    private val _playerState = MutableLiveData<AudioPlayerState>()
+    val playerState: LiveData<AudioPlayerState> get() = _playerState
 
     private var previewUrl: String? = null
 
     init {
-        _playerState.value = STATE_DEFAULT
-        _isPlayButtonEnabled.value = false
+        _playerState.value = AudioPlayerState.Default()
     }
 
     fun setDataSource(previewUrl: String) {
@@ -47,20 +36,19 @@ class AudioPlayerViewModel : ViewModel() {
         mediaPlayer.setDataSource(previewUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            _isPlayButtonEnabled.value = true
-            _playerState.value = STATE_PREPARED
+            _playerState.value = AudioPlayerState.Prepared()
         }
         mediaPlayer.setOnCompletionListener {
-            _playerState.value = STATE_PREPARED
+            _playerState.value = AudioPlayerState.Prepared()
             handler.removeCallbacks(updatingTime)
         }
     }
 
     private val updatingTime = object : Runnable {
         override fun run() {
-            if (_playerState.value == STATE_PLAYING) {
-                _currentPosition.value = SimpleDateFormat("mm:ss", Locale.getDefault())
-                    .format(mediaPlayer.currentPosition)
+            val currentState = _playerState.value
+            if (currentState is AudioPlayerState.Playing) {
+                updateState(currentState.copy(currentPosition = formatTime(mediaPlayer.currentPosition)))
                 handler.postDelayed(this, UPDATE_TIME)
             }
         }
@@ -68,20 +56,21 @@ class AudioPlayerViewModel : ViewModel() {
 
     fun startPlayer() {
         mediaPlayer.start()
-        _playerState.value = STATE_PLAYING
+        updateState(AudioPlayerState.Playing(currentPosition = formatTime(mediaPlayer.currentPosition)))
         handler.post(updatingTime)
     }
 
     fun pausePlayer() {
         mediaPlayer.pause()
-        _playerState.value = STATE_PAUSED
+        updateState(AudioPlayerState.Paused(currentPosition = formatTime(mediaPlayer.currentPosition)))
         handler.removeCallbacks(updatingTime)
     }
 
     fun playbackControl() {
         when (_playerState.value) {
-            STATE_PLAYING -> pausePlayer()
-            STATE_PREPARED, STATE_PAUSED -> startPlayer()
+            is AudioPlayerState.Playing -> pausePlayer()
+            is AudioPlayerState.Prepared, is AudioPlayerState.Paused -> startPlayer()
+            else -> Unit
         }
     }
 
@@ -91,5 +80,12 @@ class AudioPlayerViewModel : ViewModel() {
         handler.removeCallbacks(updatingTime)
     }
 
+    // Вспомогательные методы
+    private fun formatTime(milliseconds: Int): String {
+        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(milliseconds)
+    }
 
+    private fun updateState(newState: AudioPlayerState) {
+        _playerState.value = newState
+    }
 }

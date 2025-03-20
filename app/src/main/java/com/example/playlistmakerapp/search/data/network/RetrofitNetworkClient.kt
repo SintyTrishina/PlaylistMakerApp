@@ -6,19 +6,9 @@ import android.net.NetworkCapabilities
 import com.example.playlistmakerapp.search.data.NetworkClient
 import com.example.playlistmakerapp.search.data.dto.Response
 import com.example.playlistmakerapp.search.data.dto.TrackSearchRequest
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitNetworkClient(private val context: Context) : NetworkClient {
-
-    private val baseUrl = "https://itunes.apple.com"
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val trackService = retrofit.create(TrackApi::class.java)
+class RetrofitNetworkClient(private val context: Context, private val trackService: TrackApi) :
+    NetworkClient {
 
 
     override fun doRequest(dto: Any): Response {
@@ -41,8 +31,10 @@ class RetrofitNetworkClient(private val context: Context) : NetworkClient {
 
     private fun isConnected(): Boolean {
         val connectivityManager = context.getSystemService(
-            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
         if (capabilities != null) {
             when {
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> return true

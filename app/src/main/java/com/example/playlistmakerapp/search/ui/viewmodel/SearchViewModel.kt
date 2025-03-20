@@ -1,16 +1,16 @@
 package com.example.playlistmakerapp.search.ui.viewmodel
 
-import android.app.Application
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmakerapp.R
+import com.example.playlistmakerapp.search.domain.ResourcesProvider
+import com.example.playlistmakerapp.search.domain.api.SearchHistoryInteractor
 import com.example.playlistmakerapp.search.domain.api.TrackInteractor
 import com.example.playlistmakerapp.search.domain.models.Track
 import com.example.playlistmakerapp.search.ui.SearchState
@@ -18,8 +18,10 @@ import com.example.playlistmakerapp.search.ui.SingleLiveEvent
 import com.example.playlistmakerapp.util.Creator
 
 class SearchViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+    private val searchHistoryInteractor: SearchHistoryInteractor,
+    private val trackInteractor: TrackInteractor,
+    private val resourcesProvider: ResourcesProvider
+) : ViewModel() {
 
     private val _searchState = MutableLiveData<SearchState>()
     val searchState: LiveData<SearchState> get() = _searchState
@@ -31,25 +33,21 @@ class SearchViewModel(
     private val _navigateToPlayer = SingleLiveEvent<Track>()
     val navigateToPlayer: LiveData<Track> get() = _navigateToPlayer
 
-    private val _tracks = MutableLiveData<List<Track>>()
-    val tracks: LiveData<List<Track>> get() = _tracks
-
     private var lastSearchText: String? = null
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
 
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
+        fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                SearchViewModel(this[APPLICATION_KEY] as Application)
+                SearchViewModel(
+                    Creator.provideSearchHistoryInteractor(context),
+                    Creator.provideTrackInteractor(context),
+                    Creator.provideResourcesProvider(context)
+                )
             }
         }
     }
-
-
-    private val searchHistoryInteractor =
-        Creator.provideSearchHistoryInteractor(getApplication())
-    private val trackInteractor = Creator.provideTrackInteractor(getApplication())
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -85,7 +83,7 @@ class SearchViewModel(
 
     // Обработка нажатия на кнопку очистки поиска
     fun onClearButtonClicked() {
-        _tracks.value = emptyList()
+        renderState(SearchState.Content(emptyList()))
         showSearchHistory()
     }
 
@@ -120,16 +118,15 @@ class SearchViewModel(
                 object : TrackInteractor.TrackConsumer {
                     override fun consume(data: List<Track>?, errorMessage: String?) {
 
-                        _tracks.postValue(emptyList())
+                        renderState(SearchState.Content(emptyList()))
 
                         if (!data.isNullOrEmpty()) {
-                            _tracks.postValue(data)
                             renderState(SearchState.Content(data))
                         } else {
-                            renderState(SearchState.Empty(getApplication<Application>().getString(R.string.nothing_found)))
+                            renderState(SearchState.Empty(resourcesProvider.getNothingFoundText()))
                         }
                         if (errorMessage != null) {
-                            renderState(SearchState.Error(getApplication<Application>().getString(R.string.something_went_wrong)))
+                            renderState(SearchState.Error(resourcesProvider.getSomethingWentWrongText()))
                             _toastState.postValue(errorMessage)
 
                         }

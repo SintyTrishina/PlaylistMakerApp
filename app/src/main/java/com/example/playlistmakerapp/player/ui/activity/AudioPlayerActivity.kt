@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.ActivityAudioPlayerBinding
+import com.example.playlistmakerapp.player.ui.viewmodel.AudioPlayerState
 import com.example.playlistmakerapp.player.ui.viewmodel.AudioPlayerViewModel
 import com.example.playlistmakerapp.search.domain.models.Track
 import com.example.playlistmakerapp.util.Constants
@@ -20,10 +21,6 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAudioPlayerBinding
     private val viewModel: AudioPlayerViewModel by viewModels()
-//    private var mediaPlayer = MediaPlayer()
-//    private var playerState = STATE_DEFAULT
-//    private var previewUrl: String? = null
-//    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,42 +31,59 @@ class AudioPlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        val trackId = intent.getIntExtra(Constants.TRACK_ID, 0)
-        val trackName = intent.getStringExtra(Constants.TRACK_NAME)
-        val artistName = intent.getStringExtra(Constants.ARTIST_NAME)
-        val collectionName = intent.getStringExtra(Constants.COLLECTION_NAME)
-        val releaseDate = intent.getStringExtra(Constants.RELEASE_DATE)
-        val primaryGenreName = intent.getStringExtra(Constants.PRIMARY_GENRE_NAME)
-        val country = intent.getStringExtra(Constants.COUNTRY)
-        val trackTimeMillis = intent.getLongExtra(Constants.TRACK_TIME_MILLIS, 0)
-        val artworkUrl100 = intent.getStringExtra(Constants.ART_WORK_URL)
-        val previewUrl = intent.getStringExtra(Constants.PREVIEW_URL)
+        // Получение данных о треке
+        val track = getTrackFromIntent()
 
+        // Настройка UI
+        setupTrackInfo(track)
 
-        val track = Track(
-            trackId = trackId,
-            trackName = trackName ?: "",
-            artistName = artistName ?: "",
-            trackTimeMillis = trackTimeMillis,
-            artworkUrl100 = artworkUrl100 ?: "",
-            collectionName = collectionName ?: "",
-            releaseDate = releaseDate ?: "",
-            primaryGenreName = primaryGenreName ?: "",
-            country = country ?: "",
-            previewUrl = previewUrl ?: "",
+        // Подготовка плеера
+        viewModel.setDataSource(track.previewUrl)
+
+        // Наблюдение за состоянием экрана
+        viewModel.playerState.observe(this) { state ->
+            updateUI(state)
+        }
+
+        // Обработка нажатия на кнопку воспроизведения
+        binding.buttonPlay.setOnClickListener {
+            viewModel.playbackControl()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.pausePlayer()
+    }
+
+    private fun getTrackFromIntent(): Track {
+        return Track(
+            trackId = intent.getIntExtra(Constants.TRACK_ID, 0),
+            trackName = intent.getStringExtra(Constants.TRACK_NAME) ?: "",
+            artistName = intent.getStringExtra(Constants.ARTIST_NAME) ?: "",
+            trackTimeMillis = intent.getLongExtra(Constants.TRACK_TIME_MILLIS, 0),
+            artworkUrl100 = intent.getStringExtra(Constants.ART_WORK_URL) ?: "",
+            collectionName = intent.getStringExtra(Constants.COLLECTION_NAME) ?: "",
+            releaseDate = intent.getStringExtra(Constants.RELEASE_DATE) ?: "",
+            primaryGenreName = intent.getStringExtra(Constants.PRIMARY_GENRE_NAME) ?: "",
+            country = intent.getStringExtra(Constants.COUNTRY) ?: "",
+            previewUrl = intent.getStringExtra(Constants.PREVIEW_URL) ?: ""
         )
+    }
 
+    private fun setupTrackInfo(track: Track) {
         binding.trackName.text = track.trackName
         binding.artistName.text = track.artistName
         binding.trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault())
             .format(track.trackTimeMillis)
 
-        if (collectionName == null) {
+        if (track.collectionName.isEmpty()) {
             binding.collectionName.visibility = View.GONE
+        } else {
+            binding.collectionName.text = track.collectionName
         }
-        binding.collectionName.text = track.collectionName
 
-        val year = releaseDate?.substring(0, 4)
+        val year = track.releaseDate.substring(0, 4)
         binding.releaseDate.text = year
 
         binding.primaryGenreName.text = track.primaryGenreName
@@ -83,46 +97,32 @@ class AudioPlayerActivity : AppCompatActivity() {
             .centerCrop()
             .transform(RoundedCorners(cornerRadius))
             .into(binding.imageMusic)
-
-
-//        binding.buttonPlay.isEnabled = false
-        viewModel.setDataSource(track.previewUrl)
-
-        viewModel.isPlayButtonEnabled.observe(this) { isEnabled ->
-            binding.buttonPlay.isEnabled = isEnabled
-        }
-
-        viewModel.playerState.observe(this) { state ->
-            when (state) {
-                AudioPlayerViewModel.STATE_PLAYING -> {
-                    binding.buttonPlay.setImageResource(R.drawable.pause_button)
-                }
-                AudioPlayerViewModel.STATE_PAUSED -> {
-                    binding.buttonPlay.setImageResource(R.drawable.black_button)
-                }
-                AudioPlayerViewModel.STATE_PREPARED -> {
-                    binding.buttonPlay.setImageResource(R.drawable.black_button)
-                    binding.timePlay.setText(R.string.timer)
-                }
-            }
-        }
-
-        viewModel.currentPosition.observe(this) { position ->
-            binding.timePlay.text = position
-        }
-
-        // Обработка нажатия на кнопку воспроизведения
-        binding.buttonPlay.setOnClickListener {
-            viewModel.playbackControl()
-        }
-
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.pausePlayer()
-//        handler.removeCallbacks(updatingTime)
-//        pausePlayer()
+    private fun updateUI(state: AudioPlayerState) {
+        when (state) {
+            is AudioPlayerState.Default -> {
+                binding.buttonPlay.isEnabled = state.isPlayButtonEnabled
+            }
+
+            is AudioPlayerState.Prepared -> {
+                binding.buttonPlay.isEnabled = state.isPlayButtonEnabled
+                binding.buttonPlay.setImageResource(R.drawable.black_button)
+                binding.timePlay.setText(R.string.timer)
+            }
+
+            is AudioPlayerState.Playing -> {
+                binding.buttonPlay.isEnabled = state.isPlayButtonEnabled
+                binding.buttonPlay.setImageResource(R.drawable.pause_button)
+                binding.timePlay.text = state.currentPosition
+            }
+
+            is AudioPlayerState.Paused -> {
+                binding.buttonPlay.isEnabled = state.isPlayButtonEnabled
+                binding.buttonPlay.setImageResource(R.drawable.black_button)
+                binding.timePlay.text = state.currentPosition
+            }
+        }
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {
@@ -132,66 +132,4 @@ class AudioPlayerActivity : AppCompatActivity() {
             context.resources.displayMetrics
         ).toInt()
     }
-
-//    private fun preparePlayer() {
-////        mediaPlayer.setDataSource(previewUrl)
-////        mediaPlayer.prepareAsync()
-////        mediaPlayer.setOnPreparedListener {
-////            binding.buttonPlay.isEnabled = true
-////            playerState = STATE_PREPARED
-////        }
-//        mediaPlayer.setOnCompletionListener {
-////            playerState = STATE_PREPARED
-//            binding.buttonPlay.setImageResource(R.drawable.black_button)
-////            handler.removeCallbacks(updatingTime)
-//            binding.timePlay.setText(R.string.timer)
-//        }
-//    }
-//
-//    private val updatingTime = object : Runnable {
-////        override fun run() {
-////            if (playerState == STATE_PLAYING) {
-//                binding.timePlay.text =
-////                    SimpleDateFormat(
-////                        "mm:ss",
-////                        Locale.getDefault()
-////                    ).format(mediaPlayer.currentPosition)
-////                handler.postDelayed(this, UPDATE_TIME)
-//            }
-//        }
-//    }
-//
-//    private fun startPlayer() {
-////        mediaPlayer.start()
-//        binding.buttonPlay.setImageResource(R.drawable.pause_button)
-////        playerState = STATE_PLAYING
-////        handler.post(updatingTime)
-//    }
-//
-//    private fun pausePlayer() {
-////        mediaPlayer.pause()
-//        binding.buttonPlay.setImageResource(R.drawable.black_button)
-////        playerState = STATE_PAUSED
-////        handler.removeCallbacks(updatingTime)
-//    }
-//
-////    private fun playbackControl() {
-////        when (playerState) {
-////            STATE_PLAYING -> {
-////                pausePlayer()
-////            }
-////
-////            STATE_PREPARED, STATE_PAUSED -> {
-////                startPlayer()
-////            }
-////        }
-////    }
-////
-////    companion object {
-////        private const val STATE_DEFAULT = 0
-////        private const val STATE_PREPARED = 1
-////        private const val STATE_PLAYING = 2
-////        private const val STATE_PAUSED = 3
-////        private const val UPDATE_TIME = 300L
-////    }
 }
