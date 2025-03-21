@@ -2,10 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".ui.App"
+        android:name=".settings.ui.activity.App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,25 +17,20 @@
         android:theme="@style/Base.Theme.PlaylistMakerApp"
         tools:targetApi="31">
         <activity
-            android:name=".ui.audio_player.AudioPlayerActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:name=".player.ui.activity.AudioPlayerActivity"
+            android:exported="false" />
         <activity
-            android:name=".ui.search.SearchActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:name=".search.ui.activity.SearchActivity"
+            android:exported="false" />
         <activity
-            android:name=".ui.media.MediaActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:name=".media.ui.MediaActivity"
+            android:exported="false" />
         <activity
-            android:name=".ui.settings.SettingsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:name=".settings.ui.activity.SettingsActivity"
+            android:exported="false" />
         <activity
-            android:name=".ui.main_screen.MainActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
+            android:name=".main.ui.activity.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

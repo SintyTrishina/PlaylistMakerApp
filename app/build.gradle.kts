@@ -1,16 +1,21 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
 }
 
 android {
     namespace = "com.example.playlistmakerapp"
-    compileSdk = 34
+    compileSdk = 35
+
+    viewBinding {
+        enable = true
+    }
 
     defaultConfig {
         applicationId = "com.example.playlistmakerapp"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -27,13 +32,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+
+    kotlin {
+        jvmToolchain(17)
     }
 }
+
 
 dependencies {
 
@@ -50,4 +57,9 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10")
     implementation(libs.glide)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+    implementation("com.github.moxy-community:moxy:2.2.2")
+    implementation("com.github.moxy-community:moxy-androidx:2.2.2")
+    implementation("com.github.moxy-community:moxy-ktx:2.2.2")
+    kapt("com.github.moxy-community:moxy-compiler:2.2.2")
 }
