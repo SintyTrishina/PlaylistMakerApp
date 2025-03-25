@@ -13,4 +13,6 @@ object Constants {
     const val PREVIEW_URL = "PREVIEW_URL"
     const val THEME_SETTINGS = "theme_settings"
     const val SWITCH_KEY = "switch_key"
+    const val SHARED_PREFS = "search_history"
+    const val BASE_URL = "https://itunes.apple.com"
 }
