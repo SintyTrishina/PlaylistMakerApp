@@ -31,32 +31,32 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object Creator {
 
-    private const val SEARCH_HISTORY = "search_history"
-    private const val MODE_PRIVATE = Context.MODE_PRIVATE
+//    private const val SEARCH_HISTORY = "search_history"
+//    private const val MODE_PRIVATE = Context.MODE_PRIVATE
+//
+//    private fun getTrackRepository(context: Context): TrackRepository {
+//        return TrackRepositoryImpl(
+//            RetrofitNetworkClient(
+//                context,
+//                provideTrackApi(provideRetrofit())
+//            )
+//        )
+//    }
+//
+//    fun provideTrackInteractor(context: Context): TrackInteractor {
+//        return TrackInteractorImpl(getTrackRepository(context))
+//    }
+//
+////    private fun createSearchHistoryRepository(context: Context): SearchHistoryRepository {
+////        val sharedPrefs: SharedPreferences =
+////            context.getSharedPreferences(SEARCH_HISTORY, MODE_PRIVATE)
+////        return SearchHistoryRepositoryImpl(sharedPrefs)
+////    }
+//
+//    fun provideSearchHistoryInteractor(context: Context): SearchHistoryInteractor {
+//        val repository = createSearchHistoryRepository(context)
+//        return SearchHistoryInteractorImpl(repository)
 
-    private fun getTrackRepository(context: Context): TrackRepository {
-        return TrackRepositoryImpl(
-            RetrofitNetworkClient(
-                context,
-                provideTrackApi(provideRetrofit())
-            )
-        )
-    }
-
-    fun provideTrackInteractor(context: Context): TrackInteractor {
-        return TrackInteractorImpl(getTrackRepository(context))
-    }
-
-    private fun createSearchHistoryRepository(context: Context): SearchHistoryRepository {
-        val sharedPrefs: SharedPreferences =
-            context.getSharedPreferences(SEARCH_HISTORY, MODE_PRIVATE)
-        return SearchHistoryRepositoryImpl(sharedPrefs)
-    }
-
-    fun provideSearchHistoryInteractor(context: Context): SearchHistoryInteractor {
-        val repository = createSearchHistoryRepository(context)
-        return SearchHistoryInteractorImpl(repository)
-    }
 
     private lateinit var applicationContext: Context
 
@@ -91,20 +91,20 @@ object Creator {
         return InternalNavigationImpl(context)
     }
 
-    fun provideResourcesProvider(context: Context): ResourcesProvider {
-        return ResourcesProviderImpl(context)
-    }
+//    fun provideResourcesProvider(context: Context): ResourcesProvider {
+//        return ResourcesProviderImpl(context)
+//    }
 
-    private const val baseUrl = "https://itunes.apple.com"
-
-    private fun provideRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
-
-    private fun provideTrackApi(retrofit: Retrofit): TrackApi {
-        return retrofit.create(TrackApi::class.java)
-    }
+//    private const val baseUrl = "https://itunes.apple.com"
+//
+//    private fun provideRetrofit(): Retrofit {
+//        return Retrofit.Builder()
+//            .baseUrl(baseUrl)
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
+//    }
+//
+//    private fun provideTrackApi(retrofit: Retrofit): TrackApi {
+//        return retrofit.create(TrackApi::class.java)
+//    }
 }

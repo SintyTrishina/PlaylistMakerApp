@@ -5,7 +5,10 @@ import com.example.playlistmakerapp.search.domain.api.SearchHistoryRepository
 import com.example.playlistmakerapp.search.domain.models.Track
 import com.google.gson.Gson
 
-class SearchHistoryRepositoryImpl(private val sharedPrefs: SharedPreferences) :
+class SearchHistoryRepositoryImpl(
+    private val sharedPrefs: SharedPreferences,
+    private val gson: Gson,
+) :
     SearchHistoryRepository {
     private val searchList = ArrayList<Track>()
     private val maxSize = 10
@@ -28,7 +31,7 @@ class SearchHistoryRepositoryImpl(private val sharedPrefs: SharedPreferences) :
     }
 
     override fun saveTrackToPrefs(track: Track, timestamp: Long) {
-        val json = Gson().toJson(track)
+        val json = gson.toJson(track)
         sharedPrefs.edit()
             .putString(track.trackId.toString(), "$timestamp|$json")
             .apply()
@@ -53,7 +56,7 @@ class SearchHistoryRepositoryImpl(private val sharedPrefs: SharedPreferences) :
             sharedPrefs.all.values.mapNotNull { value ->
                 try {
                     val (timestamp, json) = value.toString().split("|")
-                    val track = Gson().fromJson(json, Track::class.java)
+                    val track = gson.fromJson(json, Track::class.java)
                     Pair(timestamp.toLong(), track)
                 } catch (e: Exception) {
                     null
