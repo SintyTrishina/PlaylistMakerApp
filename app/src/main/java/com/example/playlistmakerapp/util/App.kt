@@ -1,6 +1,8 @@
 package com.example.playlistmakerapp.util
 
 import android.app.Application
+import com.example.playlistmakerapp.main.domain.api.di.internalNavigationModule
+import com.example.playlistmakerapp.main.ui.di.mainViewModelModule
 import com.example.playlistmakerapp.search.data.di.searchDataModule
 import com.example.playlistmakerapp.search.domain.di.interactorModule
 import com.example.playlistmakerapp.search.domain.di.trackRepositoryModule
@@ -19,7 +21,7 @@ class App : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@App)
-            modules(searchDataModule, searchViewModelModule, trackRepositoryModule, interactorModule)
+            modules(searchDataModule, searchViewModelModule, trackRepositoryModule, interactorModule, internalNavigationModule, mainViewModelModule)
         }
         Creator.initialize(this)
 //        sharedPref = getSharedPreferences(Constants.THEME_SETTINGS, MODE_PRIVATE)

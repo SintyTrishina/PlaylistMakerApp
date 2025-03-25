@@ -87,9 +87,9 @@ object Creator {
         )
     }
 
-    fun provideInternalNavigator(context: Context): InternalNavigation {
-        return InternalNavigationImpl(context)
-    }
+//    fun provideInternalNavigator(context: Context): InternalNavigation {
+//        return InternalNavigationImpl(context)
+//    }
 
 //    fun provideResourcesProvider(context: Context): ResourcesProvider {
 //        return ResourcesProviderImpl(context)
