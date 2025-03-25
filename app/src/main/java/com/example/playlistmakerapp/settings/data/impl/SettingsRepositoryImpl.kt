@@ -1,23 +1,21 @@
 package com.example.playlistmakerapp.settings.data.impl
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmakerapp.settings.domain.api.SettingsRepository
 import com.example.playlistmakerapp.util.Constants
 
-class SettingsRepositoryImpl(context: Context) : SettingsRepository {
-
-    private val sharedPref: SharedPreferences =
-        context.getSharedPreferences(Constants.THEME_SETTINGS, Context.MODE_PRIVATE)
+class SettingsRepositoryImpl(
+    private val sharedPrefs: SharedPreferences
+) : SettingsRepository {
 
     override fun switchTheme(isDarkTheme: Boolean) {
-        sharedPref.edit().putBoolean(Constants.SWITCH_KEY, isDarkTheme).apply()
+        sharedPrefs.edit().putBoolean(Constants.SWITCH_KEY, isDarkTheme).apply()
         applyTheme(isDarkTheme)
     }
 
     override fun isDarkThemeEnabled(): Boolean {
-        return sharedPref.getBoolean(Constants.SWITCH_KEY, false)
+        return sharedPrefs.getBoolean(Constants.SWITCH_KEY, false)
     }
 
     private fun applyTheme(isDarkTheme: Boolean) {

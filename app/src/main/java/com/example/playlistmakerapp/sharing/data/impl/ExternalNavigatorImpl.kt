@@ -1,12 +1,12 @@
 package com.example.playlistmakerapp.sharing.data.impl
 
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import com.example.playlistmakerapp.sharing.domain.api.ExternalNavigator
 import com.example.playlistmakerapp.sharing.domain.models.EmailData
 
-class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
+class ExternalNavigatorImpl(private val activity: Activity) : ExternalNavigator {
 
     override fun shareLink(link: String) {
         val intent = Intent(Intent.ACTION_SEND).apply {
@@ -15,14 +15,14 @@ class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
             putExtra(Intent.EXTRA_TEXT, link)
 
         }
-        context.startActivity(Intent.createChooser(intent, "Поделиться через"))
+        activity.startActivity(Intent.createChooser(intent, "Поделиться через"))
     }
 
     override fun openLink(link: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Добавляем флаг
         }
-        context.startActivity(intent)
+        activity.startActivity(intent)
     }
 
     override fun openEmail(emailData: EmailData) {
@@ -33,7 +33,7 @@ class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
             putExtra(Intent.EXTRA_SUBJECT, emailData.extraSubject)
             putExtra(Intent.EXTRA_TEXT, emailData.extraText)
         }
-        context.startActivity(Intent.createChooser(intent, emailData.sendTitle))
+        activity.startActivity(Intent.createChooser(intent, emailData.sendTitle))
 
     }
 }

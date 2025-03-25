@@ -2,30 +2,22 @@ package com.example.playlistmakerapp.settings.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmakerapp.databinding.ActivitySettingsBinding
 import com.example.playlistmakerapp.settings.ui.viewmodel.SettingsViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
 
-    private lateinit var settingsViewModel: SettingsViewModel
-
-//    override fun onPause() {
-//        super.onPause()
-//        (applicationContext as App).switchTheme(binding.switcher.isChecked)
-//    }
+    private val settingsViewModel by viewModel<SettingsViewModel>() { parametersOf(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        settingsViewModel = ViewModelProvider(
-            this,
-            SettingsViewModel.getViewModelFactory(this)
-        )[SettingsViewModel::class.java]
 
         settingsViewModel.darkThemeEnabled.observe(this) {
             binding.switcher.isChecked = settingsViewModel.isDarkThemeEnabled()
@@ -40,15 +32,15 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.buttonShare.setOnClickListener {
-            settingsViewModel.shareApp()
+            settingsViewModel.shareApp(this)
         }
 
         binding.buttonSupport.setOnClickListener {
-            settingsViewModel.openSupport()
+            settingsViewModel.openSupport(this)
         }
 
         binding.buttonAgreement.setOnClickListener {
-            settingsViewModel.openTerms()
+            settingsViewModel.openTerms(this)
         }
     }
 }

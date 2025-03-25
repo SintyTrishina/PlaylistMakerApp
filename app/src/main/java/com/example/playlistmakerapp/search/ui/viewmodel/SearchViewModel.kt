@@ -1,21 +1,16 @@
 package com.example.playlistmakerapp.search.ui.viewmodel
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmakerapp.search.domain.ResourcesProvider
 import com.example.playlistmakerapp.search.domain.api.SearchHistoryInteractor
 import com.example.playlistmakerapp.search.domain.api.TrackInteractor
 import com.example.playlistmakerapp.search.domain.models.Track
 import com.example.playlistmakerapp.search.ui.SearchState
 import com.example.playlistmakerapp.search.ui.SingleLiveEvent
-import com.example.playlistmakerapp.util.Creator
 
 class SearchViewModel(
     private val searchHistoryInteractor: SearchHistoryInteractor,
@@ -26,8 +21,8 @@ class SearchViewModel(
     private val _searchState = MutableLiveData<SearchState>()
     val searchState: LiveData<SearchState> get() = _searchState
 
-    private val _toastState = SingleLiveEvent<String>()
-    val toastState: LiveData<String> get() = _toastState
+    private val _toastState = SingleLiveEvent<String?>()
+    val toastState: LiveData<String?> get() = _toastState
 
 
     private val _navigateToPlayer = SingleLiveEvent<Track>()
@@ -37,16 +32,6 @@ class SearchViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
-
-        fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SearchViewModel(
-                    Creator.provideSearchHistoryInteractor(context),
-                    Creator.provideTrackInteractor(context),
-                    Creator.provideResourcesProvider(context)
-                )
-            }
-        }
     }
 
     private val handler = Handler(Looper.getMainLooper())
