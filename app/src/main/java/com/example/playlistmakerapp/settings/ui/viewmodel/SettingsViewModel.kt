@@ -1,5 +1,6 @@
 package com.example.playlistmakerapp.settings.ui.viewmodel
 
+import android.app.Activity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,16 +30,16 @@ class SettingsViewModel(
         return settingsInteractor.isDarkThemeEnabled()
     }
 
-    fun shareApp() {
-        sharingInteractor.shareApp()
+    fun shareApp(activity: Activity) {
+        sharingInteractor.shareApp(activity)
     }
 
-    fun openTerms() {
-        sharingInteractor.openTerms()
+    fun openTerms(activity: Activity) {
+        sharingInteractor.openTerms(activity)
     }
 
-    fun openSupport() {
-        sharingInteractor.openSupport()
+    fun openSupport(activity: Activity) {
+        sharingInteractor.openSupport(activity)
     }
 
 }

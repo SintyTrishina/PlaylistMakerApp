@@ -32,15 +32,15 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.buttonShare.setOnClickListener {
-            settingsViewModel.shareApp()
+            settingsViewModel.shareApp(this)
         }
 
         binding.buttonSupport.setOnClickListener {
-            settingsViewModel.openSupport()
+            settingsViewModel.openSupport(this)
         }
 
         binding.buttonAgreement.setOnClickListener {
-            settingsViewModel.openTerms()
+            settingsViewModel.openTerms(this)
         }
     }
 }
