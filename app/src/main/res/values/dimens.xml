@@ -3,6 +3,7 @@
     <dimen name="padding">16dp</dimen>
     <dimen name="textSize">22sp</dimen>
     <dimen name="smallText">16sp</dimen>
+    <dimen name="tabText">14sp</dimen>
     <dimen name="iconSize">24dp</dimen>
     <dimen name="iconPadding">8dp</dimen>
     <dimen name="smallPadding">4dp</dimen>
@@ -12,4 +13,11 @@
     <dimen name="imageSmallButtonDimen">51dp</dimen>
     <dimen name="imageBigButtonDimen">100dp</dimen>
     <dimen name="progressBar">44dp</dimen>
+    <dimen name="bigPadding">64dp</dimen>
+    <dimen name="tabIndicatorHeight">2dp</dimen>
+    <dimen name="tabMaxWidth">148dp</dimen>
+    <dimen name="paddingErrorHor">120dp</dimen>
+    <dimen name="paddingErrorTop">106dp</dimen>
+    <dimen name="margine24">24dp</dimen>
+    <dimen name="text19">19sp</dimen>
 </resources>

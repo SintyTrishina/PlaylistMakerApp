@@ -58,4 +58,5 @@ dependencies {
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
     implementation(libs.koin.android)
+    implementation(libs.androidx.viewpager2)
 }

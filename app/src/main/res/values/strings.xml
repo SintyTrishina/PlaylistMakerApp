@@ -26,4 +26,10 @@
     <string name="style">Жанр</string>
     <string name="country">Страна</string>
     <string name="timer">00:00</string>
+    <string name="titleMedia">Медиатека</string>
+    <string name="errorMessage">Ваша медиатека пуста</string>
+    <string name="errorMessagePlaylist">Вы не создали\n ни одного плейлиста</string>
+    <string name="createPlaylist">Новый плейлист</string>
+    <string name="favourites">Избранные треки</string>
+    <string name="playlists">Плейлисты</string>
 </resources>
