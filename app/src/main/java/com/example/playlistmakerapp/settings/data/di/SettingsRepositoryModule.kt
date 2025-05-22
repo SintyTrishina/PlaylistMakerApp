@@ -7,6 +7,6 @@ import org.koin.dsl.module
 val settingsRepositoryModule = module {
 
     single<SettingsRepository> {
-        SettingsRepositoryImpl(get())
+        SettingsRepositoryImpl(get(), get())
     }
 }

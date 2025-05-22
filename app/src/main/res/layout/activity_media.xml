@@ -28,6 +28,7 @@
         app:tabIndicatorColor="@color/placeholderColor"
         app:tabIndicatorHeight="@dimen/tabIndicatorHeight"
         app:tabMode="fixed"
+        app:tabIndicatorFullWidth="false"
         app:tabSelectedTextColor="@color/placeholderColor"
         app:tabTextAppearance="@style/TabText"
         app:tabTextColor="@color/placeholderColor" />

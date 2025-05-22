@@ -18,7 +18,7 @@ class SettingsViewModel(
 
     init {
         // Загружаем текущее состояние темы при инициализации ViewModel
-        _darkThemeEnabled.value = settingsInteractor.isDarkThemeEnabled()
+        _darkThemeEnabled.value = settingsInteractor.getTheme()
     }
 
     fun switchTheme(isDarkTheme: Boolean) {
@@ -27,7 +27,7 @@ class SettingsViewModel(
     }
 
     fun isDarkThemeEnabled(): Boolean {
-        return settingsInteractor.isDarkThemeEnabled()
+        return settingsInteractor.getTheme()
     }
 
     fun shareApp(activity: Activity) {

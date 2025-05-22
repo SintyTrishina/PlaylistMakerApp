@@ -19,8 +19,13 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        settingsViewModel.darkThemeEnabled.observe(this) {
-            binding.switcher.isChecked = settingsViewModel.isDarkThemeEnabled()
+        // Инициализация свитчера текущим значением
+        binding.switcher.isChecked = settingsViewModel.isDarkThemeEnabled()
+
+        settingsViewModel.darkThemeEnabled.observe(this) { isDark ->
+            if (binding.switcher.isChecked != isDark) {
+                binding.switcher.isChecked = isDark
+            }
         }
 
         binding.switcher.setOnCheckedChangeListener { _, checked ->
