@@ -1,38 +1,50 @@
-package com.example.playlistmakerapp.player.ui.activity
+package com.example.playlistmakerapp.player.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmakerapp.R
-import com.example.playlistmakerapp.databinding.ActivityAudioPlayerBinding
+import com.example.playlistmakerapp.databinding.FragmentAudioPlayerBinding
 import com.example.playlistmakerapp.player.ui.viewmodel.AudioPlayerState
 import com.example.playlistmakerapp.player.ui.viewmodel.AudioPlayerViewModel
 import com.example.playlistmakerapp.search.domain.models.Track
-import com.example.playlistmakerapp.util.Constants
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class AudioPlayerActivity : AppCompatActivity() {
+class AudioPlayerFragment : Fragment() {
 
-    private lateinit var binding: ActivityAudioPlayerBinding
+    private var _binding: FragmentAudioPlayerBinding? = null
+    private val binding: FragmentAudioPlayerBinding get() = _binding!!
+
     private val viewModel by viewModel<AudioPlayerViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.back.setOnClickListener {
-            finish()
+            findNavController().navigateUp()
         }
 
         // Получение данных о треке
-        val track = getTrackFromIntent()
+        val track = arguments?.getParcelable<Track>(TRACK_KEY) ?: return
 
         // Настройка UI
         setupTrackInfo(track)
@@ -41,7 +53,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         viewModel.setDataSource(track.previewUrl)
 
         // Наблюдение за состоянием экрана
-        viewModel.playerState.observe(this) { state ->
+        viewModel.playerState.observe(viewLifecycleOwner) { state ->
             updateUI(state)
         }
 
@@ -56,19 +68,9 @@ class AudioPlayerActivity : AppCompatActivity() {
         viewModel.pausePlayer()
     }
 
-    private fun getTrackFromIntent(): Track {
-        return Track(
-            trackId = intent.getIntExtra(Constants.TRACK_ID, 0),
-            trackName = intent.getStringExtra(Constants.TRACK_NAME) ?: "",
-            artistName = intent.getStringExtra(Constants.ARTIST_NAME) ?: "",
-            trackTimeMillis = intent.getLongExtra(Constants.TRACK_TIME_MILLIS, 0),
-            artworkUrl100 = intent.getStringExtra(Constants.ART_WORK_URL) ?: "",
-            collectionName = intent.getStringExtra(Constants.COLLECTION_NAME) ?: "",
-            releaseDate = intent.getStringExtra(Constants.RELEASE_DATE) ?: "",
-            primaryGenreName = intent.getStringExtra(Constants.PRIMARY_GENRE_NAME) ?: "",
-            country = intent.getStringExtra(Constants.COUNTRY) ?: "",
-            previewUrl = intent.getStringExtra(Constants.PREVIEW_URL) ?: ""
-        )
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupTrackInfo(track: Track) {
@@ -89,7 +91,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         binding.primaryGenreName.text = track.primaryGenreName
         binding.country.text = track.country
 
-        val cornerRadius = dpToPx(8f, this)
+        val cornerRadius = dpToPx(8f, requireContext())
         Glide.with(binding.imageMusic.context)
             .load(track.getCoverArtwork())
             .placeholder(R.drawable.placeholder)
@@ -131,5 +133,12 @@ class AudioPlayerActivity : AppCompatActivity() {
             dp,
             context.resources.displayMetrics
         ).toInt()
+    }
+
+    companion object {
+
+        private const val TRACK_KEY = "track_key"
+
+        fun createArgs(trackKey: Track): Bundle = bundleOf(TRACK_KEY to trackKey)
     }
 }

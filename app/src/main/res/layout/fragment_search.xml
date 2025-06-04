@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/backgroundSettingsScreen"
     android:orientation="vertical"
-    tools:context=".search.ui.activity.SearchActivity">
+    tools:context=".search.ui.fragment.SearchFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,15 +16,6 @@
         android:paddingLeft="@dimen/smallPadding"
         android:paddingTop="@dimen/smallPadding"
         android:paddingBottom="@dimen/smallPadding">
-
-        <ImageView
-            android:id="@+id/back"
-            style="@style/ArrowBack"
-            android:layout_width="@dimen/dimenSize"
-            android:layout_height="@dimen/dimenSize"
-            android:paddingHorizontal="@dimen/imagePadding"
-            android:paddingVertical="@dimen/imagePadding"
-            android:src="@drawable/arrowback" />
 
         <TextView
             style="@style/TopText"

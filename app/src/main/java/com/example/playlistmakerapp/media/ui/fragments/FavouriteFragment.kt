@@ -13,16 +13,6 @@ import org.koin.core.parameter.parametersOf
 
 class FavouriteFragment : Fragment() {
 
-    companion object {
-        private const val TRACK_ID = "trackId"
-
-        fun newInstance(trackId: Int): Fragment {
-            return FavouriteFragment().apply {
-                arguments = bundleOf(TRACK_ID to trackId)
-            }
-        }
-    }
-
     private val favouritesViewModel: FavouritesViewModel by viewModel {
         parametersOf(
             requireArguments().getInt(
@@ -54,6 +44,21 @@ class FavouriteFragment : Fragment() {
 
     private fun showError() {
         binding.favouriteRoot.visibility = View.VISIBLE
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    companion object {
+        private const val TRACK_ID = "trackId"
+
+        fun newInstance(trackId: Int): Fragment {
+            return FavouriteFragment().apply {
+                arguments = bundleOf(TRACK_ID to trackId)
+            }
+        }
     }
 
 }

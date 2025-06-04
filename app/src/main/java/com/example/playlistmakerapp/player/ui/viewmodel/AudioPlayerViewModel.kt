@@ -11,10 +11,6 @@ import java.util.Locale
 
 class AudioPlayerViewModel : ViewModel() {
 
-    companion object {
-        const val UPDATE_TIME = 300L
-    }
-
     private var mediaPlayer = MediaPlayer()
     private val handler = Handler(Looper.getMainLooper())
 
@@ -87,5 +83,9 @@ class AudioPlayerViewModel : ViewModel() {
 
     private fun updateState(newState: AudioPlayerState) {
         _playerState.value = newState
+    }
+
+    companion object {
+        const val UPDATE_TIME = 300L
     }
 }

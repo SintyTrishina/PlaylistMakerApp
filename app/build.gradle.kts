@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -59,4 +60,6 @@ dependencies {
     annotationProcessor(libs.compiler)
     implementation(libs.koin.android)
     implementation(libs.androidx.viewpager2)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 }

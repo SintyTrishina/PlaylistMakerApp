@@ -4,17 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".media.ui.activity.MediaActivity">
+    style="@style/ModeSettingsScreen"
+    tools:context=".media.ui.fragments.MediaFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:contentInsetStart="@dimen/padding"
-        app:contentInsetStartWithNavigation="@dimen/bigPadding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/arrowback"
         app:title="@string/titleMedia"
         app:titleTextAppearance="@style/TopText" />
 
@@ -26,6 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolBar"
         app:tabIndicatorColor="@color/placeholderColor"
+        app:tabIndicatorFullWidth="false"
         app:tabIndicatorHeight="@dimen/tabIndicatorHeight"
         app:tabMode="fixed"
         app:tabSelectedTextColor="@color/placeholderColor"
