@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".settings.ui.activity.SettingsActivity">
+    tools:context=".settings.ui.fragment.SettingsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,15 +15,6 @@
         android:paddingLeft="@dimen/smallPadding"
         android:paddingTop="@dimen/smallPadding"
         android:paddingBottom="@dimen/smallPadding">
-
-        <ImageView
-            android:id="@+id/back"
-            style="@style/ArrowBack"
-            android:layout_width="@dimen/dimenSize"
-            android:layout_height="@dimen/dimenSize"
-            android:paddingHorizontal="@dimen/imagePadding"
-            android:paddingVertical="@dimen/imagePadding"
-            android:src="@drawable/arrowback" />
 
         <TextView
             style="@style/TopText"

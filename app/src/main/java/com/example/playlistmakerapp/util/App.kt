@@ -2,8 +2,6 @@ package com.example.playlistmakerapp.util
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmakerapp.main.domain.api.di.internalNavigationModule
-import com.example.playlistmakerapp.main.ui.di.mainViewModelModule
 import com.example.playlistmakerapp.media.ui.di.mediaViewModelModule
 import com.example.playlistmakerapp.player.ui.di.playerViewModelModule
 import com.example.playlistmakerapp.search.data.di.searchDataModule
@@ -32,8 +30,6 @@ class App : Application() {
                 searchViewModelModule,
                 trackRepositoryModule,
                 interactorModule,
-                internalNavigationModule,
-                mainViewModelModule,
                 playerViewModelModule,
                 externalNavigatorModule,
                 sharingResourcesProviderModule,

@@ -1,29 +1,29 @@
-package com.example.playlistmakerapp.search.ui.activity
+package com.example.playlistmakerapp.search.ui.fragment
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import com.example.playlistmakerapp.R
-import com.example.playlistmakerapp.databinding.ActivitySearchBinding
-import com.example.playlistmakerapp.player.ui.activity.AudioPlayerActivity
+import com.example.playlistmakerapp.databinding.FragmentSearchBinding
+import com.example.playlistmakerapp.player.ui.fragment.AudioPlayerFragment
 import com.example.playlistmakerapp.search.domain.models.Track
 import com.example.playlistmakerapp.search.ui.SearchState
 import com.example.playlistmakerapp.search.ui.TrackAdapter
 import com.example.playlistmakerapp.search.ui.viewmodel.SearchViewModel
-import com.example.playlistmakerapp.util.Constants
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
     companion object {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
@@ -32,7 +32,7 @@ class SearchActivity : AppCompatActivity() {
     private val viewModel by viewModel<SearchViewModel>()
 
 
-    private lateinit var binding: ActivitySearchBinding
+    private lateinit var binding: FragmentSearchBinding
     private var userText = ""
 
     private val trackAdapter = TrackAdapter {
@@ -45,39 +45,35 @@ class SearchActivity : AppCompatActivity() {
     private var isClickAllowed = true
     private var textWatcher: TextWatcher? = null
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         binding.trackRecyclerView.adapter = trackAdapter
 
         setupListeners()
-        viewModel.searchState.observe(this) {
+        viewModel.searchState.observe(viewLifecycleOwner) {
             render(it)
         }
 
-        viewModel.toastState.observe(this) {
+        viewModel.toastState.observe(viewLifecycleOwner) {
             it?.let { showToast(it) }
         }
-        viewModel.navigateToPlayer.observe(this) { track ->
-            val intent = Intent(this, AudioPlayerActivity::class.java).apply {
-                putExtra(Constants.TRACK_ID, track.trackId)
-                putExtra(Constants.TRACK_NAME, track.trackName)
-                putExtra(Constants.ARTIST_NAME, track.artistName)
-                putExtra(Constants.COLLECTION_NAME, track.collectionName)
-                putExtra(Constants.RELEASE_DATE, track.releaseDate)
-                putExtra(Constants.PRIMARY_GENRE_NAME, track.primaryGenreName)
-                putExtra(Constants.COUNTRY, track.country)
-                putExtra(Constants.TRACK_TIME_MILLIS, track.trackTimeMillis)
-                putExtra(Constants.ART_WORK_URL, track.artworkUrl100)
-                putExtra(Constants.PREVIEW_URL, track.previewUrl)
+        viewModel.navigateToPlayer.observe(viewLifecycleOwner) { track ->
+            parentFragmentManager.commit {
+                replace(R.id.rootFragmentContainerView, AudioPlayerFragment.newInstance(track))
+                addToBackStack(null)
             }
-            startActivity(intent)
         }
         viewModel.onCreate()
-
     }
 
     private fun setupListeners() {
@@ -86,16 +82,12 @@ class SearchActivity : AppCompatActivity() {
             viewModel.onSearchFocusChanged(hasFocus)
         }
 
-        binding.back.setOnClickListener {
-            finish()
-        }
-
         binding.clearIcon.setOnClickListener {
             viewModel.onClearButtonClicked()
             binding.inputEditText.setText("")
             binding.clearIcon.visibility = View.GONE
             val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
         }
 
@@ -141,16 +133,13 @@ class SearchActivity : AppCompatActivity() {
         return current
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         textWatcher?.let { binding.inputEditText.removeTextChangedListener(it) }
-
-
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun render(state: SearchState) {
