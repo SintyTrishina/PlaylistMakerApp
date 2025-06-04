@@ -20,4 +20,6 @@
     <color name="updateText">#1A1B22</color>
     <color name="roundButton">#40FFFFFF</color>
     <color name="arrowBack">#FFFFFF</color>
+    <color name="activeColor">#3772E7</color>
+    <color name="inactiveColor">#FFFFFF</color>
 </resources>

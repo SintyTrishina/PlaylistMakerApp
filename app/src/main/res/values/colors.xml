@@ -22,4 +22,7 @@
     <color name="arrowBack">#1A1B22</color>
     <color name="progressBarColor">#3772E7</color>
     <color name="titleMedia">#1A1B22</color>
+    <color name="activeColor">#3772E7</color>
+    <color name="inactiveColor">#1A1B22</color>
+    <color name="viewMenu">#E6E8EB</color>
 </resources>

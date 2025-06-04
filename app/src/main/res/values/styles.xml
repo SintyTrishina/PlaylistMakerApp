@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    
+    <style name="MenuStyle" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@color/color_menu</item>
+        <item name="itemTextColor">@color/color_menu</item>
+        <item name="itemTextAppearanceActive">@style/ActiveText</item>
+        <item name="itemTextAppearanceInactive">@style/InactiveText</item>
+        <item name="backgroundTint">@color/backgroundSettingsScreen</item>
+    </style>
+
+    <style name="ActiveText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="fontFamily">@font/ys_display_regular</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="InactiveText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="fontFamily">@font/ys_display_regular</item>
+        <item name="android:textAlignment">center</item>
+
+    </style>
 
     <style name="ModeFirstScreen">
         <item name="android:background">@color/blue</item>

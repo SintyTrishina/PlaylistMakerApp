@@ -2,6 +2,9 @@ package com.example.playlistmakerapp.main.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.ActivityRootBinding
 
 class RootActivity : AppCompatActivity() {
@@ -12,5 +15,10 @@ class RootActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRootBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val navController =
+            (supportFragmentManager.findFragmentById(R.id.rootFragmentContainerView) as NavHostFragment).navController
+
+        binding.bottomNavigationView.setupWithNavController(navController)
     }
 }
