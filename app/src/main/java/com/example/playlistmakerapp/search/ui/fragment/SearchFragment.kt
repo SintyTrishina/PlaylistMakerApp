@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import androidx.navigation.fragment.findNavController
 import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentSearchBinding
 import com.example.playlistmakerapp.player.ui.fragment.AudioPlayerFragment
@@ -68,10 +69,7 @@ class SearchFragment : Fragment() {
             it?.let { showToast(it) }
         }
         viewModel.navigateToPlayer.observe(viewLifecycleOwner) { track ->
-            parentFragmentManager.commit {
-                replace(R.id.rootFragmentContainerView, AudioPlayerFragment.newInstance(track))
-                addToBackStack(null)
-            }
+            findNavController().navigate(R.id.action_searchFragment_to_audioPlayerFragment, AudioPlayerFragment.createArgs(track))
         }
         viewModel.onCreate()
     }

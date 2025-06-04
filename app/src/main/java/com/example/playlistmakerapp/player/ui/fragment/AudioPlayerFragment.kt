@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmakerapp.R
@@ -24,15 +25,11 @@ class AudioPlayerFragment : Fragment() {
     private lateinit var binding: FragmentAudioPlayerBinding
     private val viewModel by viewModel<AudioPlayerViewModel>()
 
-    companion object{
+    companion object {
 
         private const val TRACK_KEY = "track_key"
 
-        fun newInstance(trackKey: Track) : AudioPlayerFragment {
-            return AudioPlayerFragment().apply {
-                arguments = bundleOf(TRACK_KEY to trackKey)
-            }
-        }
+        fun createArgs(trackKey: Track): Bundle = bundleOf(TRACK_KEY to trackKey)
     }
 
     override fun onCreateView(
@@ -40,14 +37,15 @@ class AudioPlayerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentAudioPlayerBinding.inflate(inflater,container,false)
+        binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.back.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+            findNavController().navigateUp()
         }
 
         // Получение данных о треке

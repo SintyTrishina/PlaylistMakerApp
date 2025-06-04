@@ -141,32 +141,4 @@ class SearchViewModel(
             renderState(SearchState.Content(ArrayList()))
         }
     }
-
-
-//    fun onSaveInstanceState(outState: Bundle) {
-//        outState.putString(USER_TEXT, lastSearchText)
-//
-//        val json = Gson().toJson(tracks)
-//        outState.putString(TRACK_LIST_KEY, json)
-//
-//        searchHistoryInteractor.getHistory()
-//    }
-//
-//    fun onRestoreInstanceState(savedInstanceState: Bundle) {
-//
-//        lastSearchText = savedInstanceState.getString(USER_TEXT, "")
-//
-//        val json = savedInstanceState.getString(TRACK_LIST_KEY, "[]")
-//        val type = object : TypeToken<ArrayList<Track>>() {}.type
-//        tracks = Gson().fromJson(json, type)
-//
-//        if (tracks.isNotEmpty()) {
-//            _searchState.postValue(SearchState.Content(tracks))
-//        } else {
-//            showSearchHistory()
-//        }
-//
-//        searchHistoryInteractor.loadHistoryFromPrefs()
-//    }
-
 }
