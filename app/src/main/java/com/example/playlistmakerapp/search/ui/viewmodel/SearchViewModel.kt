@@ -30,10 +30,6 @@ class SearchViewModel(
 
     private var lastSearchText: String? = null
 
-    companion object {
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-    }
-
     private val handler = Handler(Looper.getMainLooper())
 
 
@@ -140,5 +136,9 @@ class SearchViewModel(
         handler.post {
             renderState(SearchState.Content(ArrayList()))
         }
+    }
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }

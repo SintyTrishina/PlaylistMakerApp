@@ -13,16 +13,6 @@ import org.koin.core.parameter.parametersOf
 
 class PlaylistsFragment : Fragment() {
 
-    companion object {
-        private const val PLAYLIST_ID = "playlistId"
-
-        fun newInstance(playlistId: Int): Fragment {
-            return PlaylistsFragment().apply {
-                arguments = bundleOf(PLAYLIST_ID to playlistId)
-            }
-        }
-    }
-
     private val playlistsViewModel: PlaylistsViewModel by viewModel {
         parametersOf(
             requireArguments().getInt(
@@ -51,7 +41,22 @@ class PlaylistsFragment : Fragment() {
 
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun showError() {
         binding.playlistsRoot.visibility = View.VISIBLE
+    }
+
+    companion object {
+        private const val PLAYLIST_ID = "playlistId"
+
+        fun newInstance(playlistId: Int): Fragment {
+            return PlaylistsFragment().apply {
+                arguments = bundleOf(PLAYLIST_ID to playlistId)
+            }
+        }
     }
 }

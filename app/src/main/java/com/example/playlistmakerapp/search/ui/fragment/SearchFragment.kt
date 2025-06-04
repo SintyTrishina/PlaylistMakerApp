@@ -13,7 +13,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentSearchBinding
@@ -26,14 +25,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
 
-    companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
-    }
-
     private val viewModel by viewModel<SearchViewModel>()
 
 
-    private lateinit var binding: FragmentSearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding: FragmentSearchBinding get()=_binding!!
     private var userText = ""
 
     private val trackAdapter = TrackAdapter {
@@ -51,7 +47,7 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -134,6 +130,7 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         textWatcher?.let { binding.inputEditText.removeTextChangedListener(it) }
+        _binding = null
     }
 
     private fun showToast(message: String) {
@@ -206,6 +203,10 @@ class SearchFragment : Fragment() {
         trackAdapter.tracks.addAll(history)
         trackAdapter.notifyDataSetChanged()
 
+    }
+
+    companion object {
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
 

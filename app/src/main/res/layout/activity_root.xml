@@ -19,6 +19,7 @@ tools:context=".main.ui.activity.RootActivity">
     app:navGraph="@navigation/nav_graph" />
 
     <View
+        android:id="@+id/viewMenu"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="@color/viewMenu"

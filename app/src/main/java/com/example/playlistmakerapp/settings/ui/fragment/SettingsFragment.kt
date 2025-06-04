@@ -12,7 +12,8 @@ import org.koin.core.parameter.parametersOf
 
 class SettingsFragment : Fragment() {
 
-    private lateinit var binding: FragmentSettingsBinding
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding: FragmentSettingsBinding get() = _binding!!
 
     private val settingsViewModel by viewModel<SettingsViewModel>() { parametersOf(requireContext()) }
 
@@ -21,7 +22,7 @@ class SettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -52,5 +53,10 @@ class SettingsFragment : Fragment() {
         binding.buttonAgreement.setOnClickListener {
             settingsViewModel.openTerms(requireContext())
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
