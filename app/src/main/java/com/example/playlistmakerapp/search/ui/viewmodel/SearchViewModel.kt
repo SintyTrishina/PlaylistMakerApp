@@ -5,12 +5,16 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmakerapp.search.domain.ResourcesProvider
 import com.example.playlistmakerapp.search.domain.api.SearchHistoryInteractor
 import com.example.playlistmakerapp.search.domain.api.TrackInteractor
 import com.example.playlistmakerapp.search.domain.models.Track
 import com.example.playlistmakerapp.search.ui.SearchState
 import com.example.playlistmakerapp.search.ui.SingleLiveEvent
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val searchHistoryInteractor: SearchHistoryInteractor,
@@ -30,21 +34,13 @@ class SearchViewModel(
 
     private var lastSearchText: String? = null
 
+    private var searchJob: Job? = null
+
     private val handler = Handler(Looper.getMainLooper())
-
-
-    private val searchRunnable = Runnable {
-        val newSearchText = lastSearchText ?: ""
-        search(newSearchText)
-    }
 
     fun onCreate() {
         searchHistoryInteractor.loadHistoryFromPrefs()
         showSearchHistory()
-    }
-
-    override fun onCleared() {
-        handler.removeCallbacks(searchRunnable)
     }
 
     // Обработка нажатия на трек
@@ -83,10 +79,13 @@ class SearchViewModel(
         if (lastSearchText == changedText) {
             return
         }
+        lastSearchText = changedText
+        searchJob?.cancel()
 
-        this.lastSearchText = changedText
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY)
+            search(changedText)
+        }
     }
 
 

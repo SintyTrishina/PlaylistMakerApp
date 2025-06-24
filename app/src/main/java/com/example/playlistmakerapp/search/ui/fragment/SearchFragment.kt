@@ -2,8 +2,6 @@ package com.example.playlistmakerapp.search.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -13,6 +11,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentSearchBinding
@@ -21,6 +20,8 @@ import com.example.playlistmakerapp.search.domain.models.Track
 import com.example.playlistmakerapp.search.ui.SearchState
 import com.example.playlistmakerapp.search.ui.TrackAdapter
 import com.example.playlistmakerapp.search.ui.viewmodel.SearchViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -29,7 +30,7 @@ class SearchFragment : Fragment() {
 
 
     private var _binding: FragmentSearchBinding? = null
-    private val binding: FragmentSearchBinding get()=_binding!!
+    private val binding: FragmentSearchBinding get() = _binding!!
     private var userText = ""
 
     private val trackAdapter = TrackAdapter {
@@ -38,7 +39,6 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private val handler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
     private var textWatcher: TextWatcher? = null
 
@@ -65,7 +65,10 @@ class SearchFragment : Fragment() {
             it?.let { showToast(it) }
         }
         viewModel.navigateToPlayer.observe(viewLifecycleOwner) { track ->
-            findNavController().navigate(R.id.action_searchFragment_to_audioPlayerFragment, AudioPlayerFragment.createArgs(track))
+            findNavController().navigate(
+                R.id.action_searchFragment_to_audioPlayerFragment,
+                AudioPlayerFragment.createArgs(track)
+            )
         }
         viewModel.onCreate()
     }
@@ -122,7 +125,10 @@ class SearchFragment : Fragment() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
         }
         return current
     }
