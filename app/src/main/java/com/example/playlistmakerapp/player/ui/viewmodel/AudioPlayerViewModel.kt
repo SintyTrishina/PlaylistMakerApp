@@ -11,9 +11,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class AudioPlayerViewModel : ViewModel() {
-
-    private var mediaPlayer = MediaPlayer()
+class AudioPlayerViewModel(private val mediaPlayer: MediaPlayer) : ViewModel() {
 
     private var timerJob: Job? = null
 

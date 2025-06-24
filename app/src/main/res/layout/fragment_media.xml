@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/ModeSettingsScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    style="@style/ModeSettingsScreen"
     tools:context=".media.ui.fragments.MediaFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -21,6 +21,7 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/backgroundSettingsScreen"
         android:textAlignment="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolBar"
