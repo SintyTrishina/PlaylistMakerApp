@@ -31,6 +31,7 @@ class SearchViewModel(
     private val _navigateToPlayer = SingleLiveEvent<Track>()
     val navigateToPlayer: LiveData<Track> get() = _navigateToPlayer
 
+
     private var lastSearchText: String? = null
 
     private var searchJob: Job? = null
@@ -78,7 +79,6 @@ class SearchViewModel(
         }
         lastSearchText = changedText
         searchJob?.cancel()
-
         searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_DELAY)
             search(changedText)
@@ -90,27 +90,38 @@ class SearchViewModel(
         if (newSearchText.isNotEmpty()) {
             renderState(SearchState.Loading)
 
-            trackInteractor.search(
-                newSearchText,
-                object : TrackInteractor.TrackConsumer {
-                    override fun consume(data: List<Track>?, errorMessage: String?) {
-
-                        renderState(SearchState.Content(emptyList()))
-
-                        if (!data.isNullOrEmpty()) {
-                            renderState(SearchState.Content(data))
-                        } else {
-                            renderState(SearchState.Empty(resourcesProvider.getNothingFoundText()))
-                        }
-                        if (errorMessage != null) {
-                            renderState(SearchState.Error(resourcesProvider.getSomethingWentWrongText()))
-                            _toastState.postValue(errorMessage)
-
-                        }
-                    }
-                })
+            viewModelScope.launch(Dispatchers.IO) {
+                trackInteractor.search(
+                    newSearchText
+                ).collect { pair ->
+                    processResult(pair.first, pair.second)
+                }
+            }
         }
     }
+
+    private fun processResult(foundTracks: List<Track>?, errorMessage: String?) {
+        val tracks = mutableListOf<Track>()
+        if (foundTracks != null) {
+            tracks.addAll(foundTracks)
+        } else renderState(SearchState.Content(emptyList()))
+
+        when {
+            errorMessage != null -> {
+                renderState(SearchState.Error(resourcesProvider.getSomethingWentWrongText()))
+                _toastState.postValue(errorMessage)
+            }
+
+            tracks.isEmpty() -> {
+                renderState(SearchState.Empty(resourcesProvider.getNothingFoundText()))
+            }
+
+            else -> {
+                renderState(SearchState.Content(tracks))
+            }
+        }
+    }
+
 
     private fun renderState(state: SearchState) {
         _searchState.postValue(state)
