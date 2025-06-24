@@ -1,7 +1,5 @@
 package com.example.playlistmakerapp.search.ui.viewmodel
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +10,7 @@ import com.example.playlistmakerapp.search.domain.api.TrackInteractor
 import com.example.playlistmakerapp.search.domain.models.Track
 import com.example.playlistmakerapp.search.ui.SearchState
 import com.example.playlistmakerapp.search.ui.SingleLiveEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -35,8 +34,6 @@ class SearchViewModel(
     private var lastSearchText: String? = null
 
     private var searchJob: Job? = null
-
-    private val handler = Handler(Looper.getMainLooper())
 
     fun onCreate() {
         searchHistoryInteractor.loadHistoryFromPrefs()
@@ -121,18 +118,18 @@ class SearchViewModel(
 
 
     fun showSearchHistory() {
-        handler.post {
-            val history = searchHistoryInteractor.getHistory()
-            if (history.isNotEmpty()) {
+        val history = searchHistoryInteractor.getHistory()
+        if (history.isNotEmpty()) {
+            viewModelScope.launch(Dispatchers.Main) {
                 renderState(SearchState.History(history))
-            } else {
-                hideSearchHistory()
             }
+        } else {
+            hideSearchHistory()
         }
     }
 
     fun hideSearchHistory() {
-        handler.post {
+        viewModelScope.launch(Dispatchers.Main) {
             renderState(SearchState.Content(ArrayList()))
         }
     }
