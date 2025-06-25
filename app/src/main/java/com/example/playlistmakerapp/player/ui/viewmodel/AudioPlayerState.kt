@@ -2,7 +2,8 @@ package com.example.playlistmakerapp.player.ui.viewmodel
 
 sealed class AudioPlayerState {
     data class Default(
-        val isPlayButtonEnabled: Boolean = false
+        val isPlayButtonEnabled: Boolean = false,
+        val currentPosition: String = "00:00"
     ) : AudioPlayerState()
 
     data class Prepared(

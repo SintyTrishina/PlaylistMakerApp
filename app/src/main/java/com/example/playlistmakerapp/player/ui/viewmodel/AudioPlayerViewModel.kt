@@ -1,18 +1,19 @@
 package com.example.playlistmakerapp.player.ui.viewmodel
 
 import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class AudioPlayerViewModel : ViewModel() {
+class AudioPlayerViewModel(private val mediaPlayer: MediaPlayer) : ViewModel() {
 
-    private var mediaPlayer = MediaPlayer()
-    private val handler = Handler(Looper.getMainLooper())
+    private var timerJob: Job? = null
 
     private val _playerState = MutableLiveData<AudioPlayerState>()
     val playerState: LiveData<AudioPlayerState> get() = _playerState
@@ -20,6 +21,12 @@ class AudioPlayerViewModel : ViewModel() {
     private var previewUrl: String? = null
 
     init {
+        _playerState.value = AudioPlayerState.Default()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        mediaPlayer.release()
         _playerState.value = AudioPlayerState.Default()
     }
 
@@ -32,34 +39,32 @@ class AudioPlayerViewModel : ViewModel() {
         mediaPlayer.setDataSource(previewUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            _playerState.value = AudioPlayerState.Prepared()
+            updateState(AudioPlayerState.Prepared())
         }
         mediaPlayer.setOnCompletionListener {
-            _playerState.value = AudioPlayerState.Prepared()
-            handler.removeCallbacks(updatingTime)
+            timerJob?.cancel()
+            updateState(AudioPlayerState.Prepared())
         }
     }
 
-    private val updatingTime = object : Runnable {
-        override fun run() {
-            val currentState = _playerState.value
-            if (currentState is AudioPlayerState.Playing) {
-                updateState(currentState.copy(currentPosition = formatTime(mediaPlayer.currentPosition)))
-                handler.postDelayed(this, UPDATE_TIME)
+    private fun startTimer() {
+        timerJob = viewModelScope.launch {
+            while (mediaPlayer.isPlaying) {
+                delay(UPDATE_TIME)
+                updateState(AudioPlayerState.Playing(true, getCurrentPlayerPosition()))
             }
         }
     }
 
-    fun startPlayer() {
+    private fun startPlayer() {
         mediaPlayer.start()
-        updateState(AudioPlayerState.Playing(currentPosition = formatTime(mediaPlayer.currentPosition)))
-        handler.post(updatingTime)
+        startTimer()
     }
 
     fun pausePlayer() {
         mediaPlayer.pause()
-        updateState(AudioPlayerState.Paused(currentPosition = formatTime(mediaPlayer.currentPosition)))
-        handler.removeCallbacks(updatingTime)
+        timerJob?.cancel()
+        updateState(AudioPlayerState.Paused(true, getCurrentPlayerPosition()))
     }
 
     fun playbackControl() {
@@ -70,19 +75,13 @@ class AudioPlayerViewModel : ViewModel() {
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        mediaPlayer.release()
-        handler.removeCallbacks(updatingTime)
-    }
-
-    // Вспомогательные методы
-    private fun formatTime(milliseconds: Int): String {
-        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(milliseconds)
+    private fun getCurrentPlayerPosition(): String {
+        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+            ?: "00:00"
     }
 
     private fun updateState(newState: AudioPlayerState) {
-        _playerState.value = newState
+        _playerState.postValue(newState)
     }
 
     companion object {
