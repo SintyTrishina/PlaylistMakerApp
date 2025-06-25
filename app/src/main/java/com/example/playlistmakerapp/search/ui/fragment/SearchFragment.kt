@@ -81,6 +81,12 @@ class SearchFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 viewModel.updateSearchText(s?.toString() ?: "")
+                // Проверяем нужно ли показывать историю при изменении текста
+                if (binding.inputEditText.hasFocus() && s.isNullOrEmpty()) {
+                    viewModel.onSearchFocusChanged(true)
+                } else {
+                    viewModel.onSearchFocusChanged(false)
+                }
             }
         }
         textWatcher?.let { binding.inputEditText.addTextChangedListener(it) }
@@ -94,10 +100,8 @@ class SearchFragment : Fragment() {
         viewModel.searchDebounce(changedText = s?.toString() ?: "")
 
         // Управление отображением истории/результатов
-        if (binding.inputEditText.hasFocus()) {
-            if (s.isNullOrEmpty()) {
-                viewModel.showSearchHistory()
-            }
+        if (binding.inputEditText.hasFocus() && s.isNullOrEmpty()) {
+            viewModel.showSearchHistory()
         }
 
         // Скрытие плейсхолдера при пустом вводе
@@ -141,6 +145,12 @@ class SearchFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.searchState.observe(viewLifecycleOwner) { state ->
             render(state)
+        }
+
+        viewModel.shouldShowHistory.observe(viewLifecycleOwner) { shouldShow ->
+            if (shouldShow && binding.inputEditText.text.isNullOrEmpty()) {
+                viewModel.showSearchHistory()
+            }
         }
 
         viewModel.toastState.observe(viewLifecycleOwner) { message ->

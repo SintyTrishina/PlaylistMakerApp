@@ -47,17 +47,18 @@ class SearchViewModel(
             savedStateHandle["last_search_text"] = value
         }
 
+    private var _shouldShowHistory = MutableLiveData(false)
+    val shouldShowHistory: LiveData<Boolean> = _shouldShowHistory
+
     init {
         loadInitialState()
+        _shouldShowHistory.value = false
     }
 
     private fun loadInitialState() {
         searchHistoryInteractor.loadHistoryFromPrefs()
-        when {
-            !lastSearchText.isNullOrEmpty() -> lastSearchText?.let { search(it) }
-            searchHistoryInteractor.getHistory().isNotEmpty() -> showSearchHistory()
-            else -> renderState(SearchState.Content(emptyList()))
-        }
+        // Убираем автоматический показ истории при инициализации
+        renderState(SearchState.Content(emptyList()))
     }
 
     fun onTrackClicked(track: Track) {
@@ -66,8 +67,11 @@ class SearchViewModel(
     }
 
     fun onSearchFocusChanged(hasFocus: Boolean) {
-        if (hasFocus && lastSearchText.isNullOrEmpty()) {
+        _shouldShowHistory.value = hasFocus && lastSearchText.isNullOrEmpty()
+        if (shouldShowHistory.value == true) {
             showSearchHistory()
+        } else {
+            renderState(SearchState.Content(currentTracks ?: emptyList()))
         }
     }
 
@@ -144,7 +148,6 @@ class SearchViewModel(
     fun showSearchHistory() {
         val history = searchHistoryInteractor.getHistory()
         if (history.isNotEmpty()) {
-            currentTracks = history
             renderState(SearchState.History(history))
         } else {
             renderState(SearchState.Content(emptyList()))
