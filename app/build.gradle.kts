@@ -63,4 +63,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.kotlinx.coroutines.android)
+    implementation("androidx.room:room-runtime:2.5.1")
+    kapt("androidx.room:room-compiler:2.5.1")  // Аннотационный процессор
+    implementation("androidx.room:room-ktx:2.5.1")
 }
