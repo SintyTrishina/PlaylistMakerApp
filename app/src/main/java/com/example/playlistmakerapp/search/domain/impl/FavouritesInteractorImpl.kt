@@ -18,5 +18,6 @@ class FavouritesInteractorImpl(private val favouritesRepository: FavouritesRepos
 
     override fun getFavourites(): Flow<List<Track>> {
         return favouritesRepository.getFavourites()
+            .map { tracks -> tracks.sortedByDescending { it.addedDate } }
     }
 }

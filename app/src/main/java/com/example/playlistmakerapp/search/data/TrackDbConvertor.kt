@@ -16,6 +16,8 @@ class TrackDbConvertor {
             track.country,
             track.collectionName,
             track.artworkUrl100,
+            track.addedDate,
+            track.isFavourite
         )
     }
 
@@ -31,6 +33,8 @@ class TrackDbConvertor {
             track.country,
             track.collectionName,
             track.artworkUrl100,
+            track.addedDate,
+            track.isFavourite
         )
     }
 }
