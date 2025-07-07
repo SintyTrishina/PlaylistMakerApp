@@ -29,11 +29,10 @@ class MediaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val trackId = 1
         val playlistId = 1
 
         binding.viewPager.adapter =
-            PagerAdapter(childFragmentManager, lifecycle, trackId, playlistId)
+            PagerAdapter(childFragmentManager, lifecycle, playlistId)
 
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             when (position) {

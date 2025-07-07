@@ -1,28 +1,33 @@
 package com.example.playlistmakerapp.media.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentFavouriteBinding
+import com.example.playlistmakerapp.media.ui.viewmodel.FavouritesState
 import com.example.playlistmakerapp.media.ui.viewmodel.FavouritesViewModel
+import com.example.playlistmakerapp.player.ui.fragment.AudioPlayerFragment
+import com.example.playlistmakerapp.search.ui.TrackAdapter
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class FavouriteFragment : Fragment() {
 
-    private val favouritesViewModel: FavouritesViewModel by viewModel {
-        parametersOf(
-            requireArguments().getInt(
-                TRACK_ID
-            )
-        )
-    }
+    private val favouritesViewModel: FavouritesViewModel by viewModel()
 
     private var _binding: FragmentFavouriteBinding? = null
     private val binding get() = _binding!!
+    private var isClickAllowed = true
+    private lateinit var adapter: TrackAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,28 +40,76 @@ class FavouriteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        adapter = TrackAdapter { track ->
+            if (clickDebounce()) {
+                parentFragment?.findNavController()?.navigate(
+                    R.id.action_mediaFragment_to_audioPlayerFragment,
+                    AudioPlayerFragment.createArgs(track)
+                )
+            }
+        }
+        binding.recyclerView.adapter = adapter
 
-        favouritesViewModel.trackIdLiveData.observe(viewLifecycleOwner) {
-            showError()
+        favouritesViewModel.favouritesState.observe(viewLifecycleOwner) { state ->
+            updateUI(state)
         }
 
     }
 
-    private fun showError() {
-        binding.favouriteRoot.visibility = View.VISIBLE
-    }
-
     override fun onDestroyView() {
+        Log.d("FavouriteFragment", "onDestroyView called")
+        binding.recyclerView.adapter = null
         super.onDestroyView()
         _binding = null
     }
 
-    companion object {
-        private const val TRACK_ID = "trackId"
+    override fun onResume() {
+        super.onResume()
+        isClickAllowed = true
+    }
 
-        fun newInstance(trackId: Int): Fragment {
+    private fun clickDebounce(): Boolean {
+        if (isClickAllowed) {
+            isClickAllowed = false
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    delay(CLICK_DEBOUNCE_DELAY)
+                } finally {
+                    isClickAllowed = true
+                }
+            }
+            return true
+        }
+        return false
+    }
+
+    private fun updateUI(favouritesState: FavouritesState) {
+        when (favouritesState) {
+            is FavouritesState.Empty -> {
+
+                binding.errorMessage.visibility = View.VISIBLE
+                binding.errorImage.visibility = View.VISIBLE
+                binding.recyclerView.visibility = View.GONE
+            }
+
+            is FavouritesState.Content -> {
+                adapter.tracks.clear()
+                adapter.tracks.addAll(favouritesState.favouritesList)
+                adapter.notifyDataSetChanged()
+                binding.errorMessage.visibility = View.GONE
+                binding.errorImage.visibility = View.GONE
+                binding.recyclerView.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    companion object {
+
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+
+        fun newInstance(): Fragment {
             return FavouriteFragment().apply {
-                arguments = bundleOf(TRACK_ID to trackId)
+                arguments = bundleOf()
             }
         }
     }

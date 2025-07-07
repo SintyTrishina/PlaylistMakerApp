@@ -1,9 +1,12 @@
 package com.example.playlistmakerapp.search.data.di
 
 import android.content.Context
+import androidx.room.Room
 import com.example.playlistmakerapp.search.data.NetworkClient
 import com.example.playlistmakerapp.search.data.ResourcesProviderImpl
 import com.example.playlistmakerapp.search.data.SearchHistoryRepositoryImpl
+import com.example.playlistmakerapp.search.data.TrackDbConvertor
+import com.example.playlistmakerapp.search.data.db.AppDataBase
 import com.example.playlistmakerapp.search.data.network.RetrofitNetworkClient
 import com.example.playlistmakerapp.search.data.network.TrackApi
 import com.example.playlistmakerapp.search.domain.ResourcesProvider
@@ -43,5 +46,12 @@ val searchDataModule = module {
     single<NetworkClient> {
         RetrofitNetworkClient(androidContext(), get())
     }
+
+    single {
+        Room.databaseBuilder(androidContext(), AppDataBase::class.java, "database.db")
+            .build()
+    }
+
+    factory { TrackDbConvertor() }
 
 }

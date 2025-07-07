@@ -26,6 +26,7 @@ class AudioPlayerFragment : Fragment() {
     private val binding: FragmentAudioPlayerBinding get() = _binding!!
 
     private val viewModel by viewModel<AudioPlayerViewModel>()
+    private var currentTrack: Track? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,22 +45,41 @@ class AudioPlayerFragment : Fragment() {
         }
 
         // Получение данных о треке
-        val track = arguments?.getParcelable<Track>(TRACK_KEY) ?: return
+        currentTrack = arguments?.getParcelable<Track>(TRACK_KEY) ?: run {
+            findNavController().navigateUp()
+            return
+        }
 
         // Настройка UI
-        setupTrackInfo(track)
+        setupTrackInfo(currentTrack!!)
+
+        // Загрузка состояния "лайка"
+        currentTrack?.let { track ->
+            viewModel.checkIsFavourite(track.trackId)
+        }
 
         // Подготовка плеера
-        viewModel.setDataSource(track.previewUrl)
+        currentTrack?.previewUrl?.let { viewModel.setDataSource(it) }
 
         // Наблюдение за состоянием экрана
         viewModel.playerState.observe(viewLifecycleOwner) { state ->
             updateUI(state)
         }
 
+        viewModel.isFavourite.observe(viewLifecycleOwner) { isLiked ->
+            currentTrack?.isFavourite = isLiked
+            updateLikeButton(isLiked)
+        }
+
         // Обработка нажатия на кнопку воспроизведения
         binding.buttonPlay.setOnClickListener {
             viewModel.playbackControl()
+        }
+
+        binding.buttonLike.setOnClickListener {
+            currentTrack?.let { track ->
+                viewModel.onFavouriteClicked(track)
+            }
         }
     }
 
@@ -71,6 +91,12 @@ class AudioPlayerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun updateLikeButton(isLiked: Boolean) {
+        binding.buttonLike.setImageResource(
+            if (isLiked) R.drawable.active_like else R.drawable.like
+        )
     }
 
     private fun setupTrackInfo(track: Track) {
@@ -136,9 +162,7 @@ class AudioPlayerFragment : Fragment() {
     }
 
     companion object {
-
         private const val TRACK_KEY = "track_key"
-
         fun createArgs(trackKey: Track): Bundle = bundleOf(TRACK_KEY to trackKey)
     }
 }
