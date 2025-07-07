@@ -56,6 +56,11 @@ class SearchFragment : Fragment() {
         restoreSearchText()
     }
 
+    override fun onResume() {
+        super.onResume()
+        isClickAllowed = true
+    }
+
     private fun setupRecyclerView() {
         binding.trackRecyclerView.adapter = trackAdapter
     }
@@ -178,15 +183,18 @@ class SearchFragment : Fragment() {
     }
 
     private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
             viewLifecycleOwner.lifecycleScope.launch {
-                delay(CLICK_DEBOUNCE_DELAY)
-                isClickAllowed = true
+                try {
+                    delay(CLICK_DEBOUNCE_DELAY)
+                } finally {
+                    isClickAllowed = true
+                }
             }
+            return true
         }
-        return current
+        return false
     }
 
     override fun onDestroyView() {
@@ -277,6 +285,6 @@ class SearchFragment : Fragment() {
     }
 
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val CLICK_DEBOUNCE_DELAY = 300L
     }
 }

@@ -1,6 +1,7 @@
 package com.example.playlistmakerapp.media.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -56,21 +57,30 @@ class FavouriteFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        Log.d("FavouriteFragment", "onDestroyView called")
         binding.recyclerView.adapter = null
         super.onDestroyView()
         _binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        isClickAllowed = true
+    }
+
     private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
             viewLifecycleOwner.lifecycleScope.launch {
-                delay(CLICK_DEBOUNCE_DELAY)
-                isClickAllowed = true
+                try {
+                    delay(CLICK_DEBOUNCE_DELAY)
+                } finally {
+                    isClickAllowed = true
+                }
             }
+            return true
         }
-        return current
+        return false
     }
 
     private fun updateUI(favouritesState: FavouritesState) {
