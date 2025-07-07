@@ -9,7 +9,7 @@ import org.koin.dsl.module
 val trackRepositoryModule = module {
 
     single<TrackRepository> {
-        TrackRepositoryImpl(get(), get(), get())
+        TrackRepositoryImpl(get(), get())
     }
 
     single<FavouritesRepository> {

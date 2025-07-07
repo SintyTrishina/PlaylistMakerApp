@@ -50,7 +50,7 @@ class AudioPlayerFragment : Fragment() {
         setupTrackInfo(track)
 
         // Подготовка плеера
-        viewModel.setDataSource(track.previewUrl)
+        track.previewUrl?.let { viewModel.setDataSource(it) }
 
         // Наблюдение за состоянием экрана
         viewModel.playerState.observe(viewLifecycleOwner) { state ->

@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.flow
 
 class TrackRepositoryImpl(
     private val networkClient: NetworkClient,
-    private val appDataBase: AppDataBase,
-    private val trackDbConvertor: TrackDbConvertor
+    private val appDataBase: AppDataBase
 ) : TrackRepository {
 
     override fun search(term: String): Flow<Resource<List<Track>>> = flow {
@@ -24,27 +23,25 @@ class TrackRepositoryImpl(
             }
 
             200 -> {
-                val favoriteTrackIds = try {
-                    appDataBase.trackDao().getTracksId()
-                } catch (e: Exception) {
-                    emptyList()
+                val idFavoriteTracks = appDataBase.trackDao().getTracksId().toSet()
+                with(response as TrackSearchResponse) {
+                    val data = results.map {
+                        Track(
+                            it.trackId,
+                            it.trackName,
+                            it.artistName,
+                            it.trackTimeMillis,
+                            it.artworkUrl100,
+                            it.collectionName,
+                            it.releaseDate,
+                            it.primaryGenreName,
+                            it.country,
+                            it.previewUrl,
+                            isFavourite = idFavoriteTracks.contains(it.trackId),
+                        )
+                    }
+                    emit(Resource.Success(data))
                 }
-                val tracks = (response as TrackSearchResponse).results.map { trackDto ->
-                    Track(
-                        trackId = trackDto.trackId,
-                        trackName = trackDto.trackName,
-                        artistName = trackDto.artistName,
-                        trackTimeMillis = trackDto.trackTimeMillis,
-                        artworkUrl100 = trackDto.artworkUrl100,
-                        collectionName = trackDto.collectionName,
-                        releaseDate = trackDto.releaseDate,
-                        primaryGenreName = trackDto.primaryGenreName,
-                        country = trackDto.country,
-                        previewUrl = trackDto.previewUrl,
-                        isFavourite = favoriteTrackIds.contains(trackDto.trackId)
-                    )
-                }
-                emit(Resource.Success(tracks))
             }
 
             else -> {
