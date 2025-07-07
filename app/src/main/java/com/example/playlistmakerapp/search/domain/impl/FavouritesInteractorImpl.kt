@@ -30,4 +30,10 @@ class FavouritesInteractorImpl(private val favouritesRepository: FavouritesRepos
         }
         emit(filteredList)
     }
+
+    override suspend fun isFavourite(trackId: Int): Boolean {
+        return favouritesRepository.getIdFavoriteTracks()
+            .first()
+            .contains(trackId)
+    }
 }

@@ -6,10 +6,10 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val mediaViewModelModule = module {
-    viewModel { (trackId:Int) ->
-        FavouritesViewModel(trackId)
+    viewModel {
+        FavouritesViewModel(get())
     }
-    viewModel { (playlistId:Int) ->
+    viewModel { (playlistId: Int) ->
         PlaylistsViewModel(playlistId)
     }
 }

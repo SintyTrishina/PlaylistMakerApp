@@ -36,7 +36,7 @@ class FavouriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        favouritesViewModel.trackIdLiveData.observe(viewLifecycleOwner) {
+        favouritesViewModel.favouritesState.observe(viewLifecycleOwner) {
             showError()
         }
 
