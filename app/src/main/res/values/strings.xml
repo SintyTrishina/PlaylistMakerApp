@@ -32,4 +32,8 @@
     <string name="createPlaylist">Новый плейлист</string>
     <string name="favourites">Избранные треки</string>
     <string name="playlists">Плейлисты</string>
+    <string name="titleNewPlaylist">Новый плейлист</string>
+    <string name="hintName">Название*</string>
+    <string name="hintDescription">Описание</string>
+    <string name="create">Создать</string>
 </resources>
