@@ -65,6 +65,7 @@
             android:id="@+id/playlistNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLength="30"
             android:maxLines="1"
             android:textAppearance="@style/editTextHint" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -88,8 +89,9 @@
             android:id="@+id/playlistDescriptionEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLength="30"
             android:maxLines="1"
-            android:textAppearance="@style/editTextHint" />
+            android:textAppearance="@style/editTextHint"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -97,7 +99,8 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/size44"
         android:layout_marginHorizontal="@dimen/margine17"
-        android:layout_marginBottom="@dimen/margine32"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/create_button"
         android:enabled="false"
         android:fontFamily="@font/ys_display_medium"
         android:gravity="center_vertical"
@@ -110,7 +113,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/create_button"
         tools:ignore="RtlCompat" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

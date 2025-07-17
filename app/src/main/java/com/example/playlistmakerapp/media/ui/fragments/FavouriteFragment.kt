@@ -57,7 +57,6 @@ class FavouriteFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        Log.d("FavouriteFragment", "onDestroyView called")
         binding.recyclerView.adapter = null
         super.onDestroyView()
         _binding = null
