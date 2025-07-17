@@ -36,4 +36,8 @@
     <string name="hintName">Название*</string>
     <string name="hintDescription">Описание</string>
     <string name="create">Создать</string>
+    <string name="alertTitle">Завершить создание плейлиста?</string>
+    <string name="alertDescr">Все несохраненные данные будут потеряны</string>
+    <string name="alertCancel">Отмена</string>
+    <string name="alertClose">Завершить</string>
 </resources>

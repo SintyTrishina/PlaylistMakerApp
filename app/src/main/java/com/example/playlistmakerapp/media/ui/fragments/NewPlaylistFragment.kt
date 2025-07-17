@@ -1,14 +1,20 @@
 package com.example.playlistmakerapp.media.ui.fragments
 
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentNewPlaylistBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class NewPlaylistFragment : Fragment() {
     private var _binding: FragmentNewPlaylistBinding? = null
@@ -16,6 +22,7 @@ class NewPlaylistFragment : Fragment() {
 
     private var playlistName: String = ""
     private var playlistDescription: String? = null
+    private var imageUri: Uri? = null
 
 
     override fun onCreateView(
@@ -68,12 +75,41 @@ class NewPlaylistFragment : Fragment() {
 
     private fun setupListeners() {
         binding.toolBar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            dialog()
         }
 
+        requireActivity().onBackPressedDispatcher.addCallback(object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                dialog()
+            }
+        })
+
+        val pickMedia =
+            registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                if (uri != null) {
+                    binding.imagePlaylist.setImageURI(uri)
+                    binding.imagePlaylist.visibility = View.VISIBLE
+                    binding.icon.visibility = View.GONE
+                    imageUri = uri
+                }
+            }
         binding.frameImage.setOnClickListener {
-
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
+    }
+
+    private fun dialog() {
+        if (imageUri != null || playlistName.isNotEmpty() || playlistDescription != null) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.alertTitle)
+                .setMessage(R.string.alertDescr)
+                .setNeutralButton(R.string.alertCancel) { dialog, which ->
+                }
+                .setPositiveButton(R.string.alertClose) { dialog, which ->
+                    findNavController().navigateUp()
+                }
+                .show()
+        } else findNavController().navigateUp()
     }
 }
 
