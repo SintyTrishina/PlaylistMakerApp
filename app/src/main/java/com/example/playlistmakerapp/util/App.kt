@@ -2,6 +2,8 @@ package com.example.playlistmakerapp.util
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmakerapp.media.domain.di.playlistInteractorModule
+import com.example.playlistmakerapp.media.domain.di.playlistRepositoryModule
 import com.example.playlistmakerapp.media.ui.di.mediaViewModelModule
 import com.example.playlistmakerapp.player.ui.di.mediaPlayerModule
 import com.example.playlistmakerapp.player.ui.di.playerViewModelModule
@@ -39,7 +41,9 @@ class App : Application() {
                 settingsInteractorModule,
                 settingsViewModelModule,
                 mediaViewModelModule,
-                mediaPlayerModule
+                mediaPlayerModule,
+                playlistRepositoryModule,
+                playlistInteractorModule
             )
         }
 

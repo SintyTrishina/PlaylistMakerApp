@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -95,6 +96,11 @@ class NewPlaylistFragment : Fragment() {
             }
         binding.frameImage.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+
+        binding.createButton.setOnClickListener {
+            findNavController().navigateUp()
+            Toast.makeText(requireContext(),"Плейлист $playlistName создан", Toast.LENGTH_LONG).show()
         }
     }
 
