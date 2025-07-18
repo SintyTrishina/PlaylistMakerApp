@@ -24,17 +24,17 @@ data class PlaylistEntity(
             imagePath?.let { Uri.parse(it) },
             tracksIds?.let {
                 Gson().fromJson(it, Array<Long>::class.java).toList()
-            } ?: emptyList()
+            } ?: emptyList(),
+            tracksCount
         )
     }
-
     companion object {
         fun fromDomain(playlist: Playlist): PlaylistEntity {
             return PlaylistEntity(
                 playlistId = playlist.id,
                 playlistName = playlist.name,
                 playlistDescription = playlist.description,
-                imagePath = playlist.imageUri?.toString(),
+                imagePath = playlist.imagePath?.toString(),
                 tracksIds = Gson().toJson(playlist.trackIds),
                 tracksCount = playlist.trackIds.size
             )

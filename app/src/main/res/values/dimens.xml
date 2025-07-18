@@ -23,6 +23,7 @@
     <dimen name="margine26">26dp</dimen>
     <dimen name="margine17">17dp</dimen>
     <dimen name="margine32">32dp</dimen>
+    <dimen name="margine4">4dp</dimen>
     <dimen name="text19">19sp</dimen>
     <dimen name="dash">30dp</dimen>
     <dimen name="dashWidth">1dp</dimen>
