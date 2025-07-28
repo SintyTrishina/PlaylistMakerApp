@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmakerapp.media.domain.db.PlaylistInteractor
 import com.example.playlistmakerapp.search.domain.db.FavouritesInteractor
 import com.example.playlistmakerapp.search.domain.models.Track
 import kotlinx.coroutines.Job
@@ -15,7 +16,8 @@ import java.util.Locale
 
 class AudioPlayerViewModel(
     private val mediaPlayer: MediaPlayer,
-    private val favouritesInteractor: FavouritesInteractor
+    private val favouritesInteractor: FavouritesInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
     private var timerJob: Job? = null

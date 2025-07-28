@@ -121,12 +121,6 @@ class NewPlaylistFragment : Fragment() {
                 ).show()
 
                 findNavController().navigateUp()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Введите название плейлиста",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
     }
