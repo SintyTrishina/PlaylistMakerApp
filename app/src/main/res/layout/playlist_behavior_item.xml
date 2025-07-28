@@ -5,7 +5,7 @@
     android:id="@+id/behavior_item"
     style="@style/ModeSettingsScreen"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="61dp"
     android:orientation="horizontal">
 
     <ImageView
