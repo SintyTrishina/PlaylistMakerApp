@@ -15,11 +15,16 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentNewPlaylistBinding
+import com.example.playlistmakerapp.media.domain.model.Playlist
+import com.example.playlistmakerapp.media.ui.viewmodel.NewPlaylistViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class NewPlaylistFragment : Fragment() {
     private var _binding: FragmentNewPlaylistBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: NewPlaylistViewModel by viewModel()
 
     private var playlistName: String = ""
     private var playlistDescription: String? = null
@@ -39,8 +44,6 @@ class NewPlaylistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupTextWatchers()
         setupListeners()
-
-
     }
 
     private fun setupTextWatchers() {
@@ -99,10 +102,35 @@ class NewPlaylistFragment : Fragment() {
         }
 
         binding.createButton.setOnClickListener {
-            findNavController().navigateUp()
-            Toast.makeText(requireContext(),"Плейлист $playlistName создан", Toast.LENGTH_LONG).show()
+            if (playlistName.isNotBlank()) {
+                val newPlaylist = Playlist(
+                    id = 0,
+                    name = playlistName,
+                    description = playlistDescription,
+                    imagePath = imageUri,
+                    trackIds = emptyList(),
+                    tracksCount = 0
+                )
+
+                viewModel.savePlaylist(newPlaylist)
+
+                Toast.makeText(
+                    requireContext(),
+                    "Плейлист \"$playlistName\" создан",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                findNavController().navigateUp()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Введите название плейлиста",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
+
 
     private fun dialog() {
         if (imageUri != null || playlistName.isNotEmpty() || playlistDescription != null) {
