@@ -1,10 +1,14 @@
 package com.example.playlistmakerapp.media.ui
 
+import android.content.Context
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.media.domain.model.Playlist
 
@@ -17,12 +21,21 @@ class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(item: Playlist) {
         playlistName.text = item.name
         tracksCount.text = convertText(item.tracksCount)
+        val cornerRadius = dpToPx(8f, itemView.context)
         Glide.with(itemView)
             .load(item.imagePath)
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.placeholder)
-            .centerCrop()
+            .transform(CenterCrop(),RoundedCorners(cornerRadius))
             .into(playlistPoster)
+    }
+
+    private fun dpToPx(dp: Float, context: Context): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp,
+            context.resources.displayMetrics
+        ).toInt()
     }
 
     private fun convertText(count: Int): String {
