@@ -58,6 +58,10 @@ class AudioPlayerViewModel(
             }
         }
     }
+    sealed class AddToPlaylistStatus {
+        data class Success(val playlistName: String) : AddToPlaylistStatus()
+        data class AlreadyExists(val playlistName: String) : AddToPlaylistStatus()
+    }
 
     fun addToPlaylistStatusHandled() {
         _addToPlaylistStatus.value = null

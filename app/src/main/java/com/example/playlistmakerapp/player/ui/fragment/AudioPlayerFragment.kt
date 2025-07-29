@@ -151,6 +151,8 @@ class AudioPlayerFragment : Fragment() {
         }
     }
 
+
+
     private fun setupTrackInfo() {
         currentTrack = arguments?.getParcelable<Track>(TRACK_KEY) ?: run {
             findNavController().navigateUp()
