@@ -1,6 +1,5 @@
 package com.example.playlistmakerapp.player.ui
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -10,10 +9,13 @@ import com.example.playlistmakerapp.media.domain.model.Playlist
 
 class PlaylistBehaviorAdapter(
     private val onPlaylistClickListener: (Playlist) -> Unit
-) :
-    RecyclerView.Adapter<PlaylistBehaviorViewHolder>() {
+) : RecyclerView.Adapter<PlaylistBehaviorViewHolder>() {
 
-    var playlists: List<Playlist> = mutableListOf()
+    var playlists: List<Playlist> = emptyList()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistBehaviorViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -22,12 +24,8 @@ class PlaylistBehaviorAdapter(
     }
 
     override fun onBindViewHolder(holder: PlaylistBehaviorViewHolder, position: Int) {
-        holder.bind(
-            playlists[position]
-        )
+        holder.bind(playlists[position])
     }
 
-    override fun getItemCount(): Int {
-        return playlists.size
-    }
+    override fun getItemCount(): Int = playlists.size
 }

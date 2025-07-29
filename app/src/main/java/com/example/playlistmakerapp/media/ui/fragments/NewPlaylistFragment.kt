@@ -107,7 +107,7 @@ class NewPlaylistFragment : Fragment() {
                     id = 0,
                     name = playlistName,
                     description = playlistDescription,
-                    imagePath = imageUri,
+                    imagePath = imageUri.toString(),
                     trackIds = emptyList(),
                     tracksCount = 0
                 )

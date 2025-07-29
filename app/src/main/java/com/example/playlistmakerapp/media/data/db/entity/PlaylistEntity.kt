@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.playlistmakerapp.media.domain.model.Playlist
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 @Entity(tableName = "playlist_table")
 data class PlaylistEntity(
@@ -13,7 +14,7 @@ data class PlaylistEntity(
     val playlistName: String,
     val playlistDescription: String? = null,
     val imagePath: String? = null,
-    val tracksIds: String? = null,
+    val tracksIds: String?,
     val tracksCount: Int = 0
 ) {
     fun toDomain(): Playlist {
@@ -21,10 +22,8 @@ data class PlaylistEntity(
             playlistId,
             playlistName,
             playlistDescription,
-            imagePath?.let { Uri.parse(it) },
-            tracksIds?.let {
-                Gson().fromJson(it, Array<Long>::class.java).toList()
-            } ?: emptyList(),
+            Uri.parse(imagePath).toString(),
+            trackIds = Gson().fromJson(tracksIds, object : TypeToken<List<String>>() {}.type),
             tracksCount
         )
     }
