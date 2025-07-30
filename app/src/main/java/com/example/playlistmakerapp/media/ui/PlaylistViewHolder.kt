@@ -23,21 +23,24 @@ class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         playlistName.text = item.name
         tracksCount.text = convertText(item.tracksCount)
 
-        item.imagePath?.let { path ->
-            loadImage(path)?.let { bitmap ->
-                val cornerRadius = dpToPx(8f, itemView.context)
-                Glide.with(itemView)
-                    .load(bitmap)
-                    .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.placeholder)
-                    .transform(CenterCrop(), RoundedCorners(cornerRadius))
-                    .into(playlistPoster)
-            } ?: run {
-                playlistPoster.setImageResource(R.drawable.placeholder)
+        when {
+            !item.imagePath.isNullOrEmpty() -> {
+                loadImage(item.imagePath)?.let { bitmap ->
+                    Glide.with(itemView)
+                        .load(bitmap)
+                        .transform(CenterCrop(), RoundedCorners(dpToPx(8f, itemView.context)))
+                        .into(playlistPoster)
+                } ?: setDefaultImage()
             }
-        } ?: run {
-            playlistPoster.setImageResource(R.drawable.placeholder)
+
+            else -> setDefaultImage()
         }
+    }
+
+    private fun setDefaultImage() {
+        Glide.with(itemView)
+            .load(R.drawable.placeholder)
+            .into(playlistPoster)
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {

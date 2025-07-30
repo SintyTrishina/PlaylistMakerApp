@@ -96,19 +96,17 @@ class NewPlaylistFragment : Fragment() {
                     id = 0,
                     name = playlistName,
                     description = playlistDescription,
-                    imagePath = savedImagePath,
+                    imagePath = savedImagePath, // Может быть null
                     trackIds = emptyList(),
                     tracksCount = 0
                 )
 
                 viewModel.savePlaylist(newPlaylist)
-
                 Toast.makeText(
                     requireContext(),
                     "Плейлист \"$playlistName\" создан",
                     Toast.LENGTH_SHORT
                 ).show()
-
                 findNavController().navigateUp()
             }
         }
@@ -117,24 +115,17 @@ class NewPlaylistFragment : Fragment() {
     private fun saveImageToInternalStorage(context: Context, imageUri: Uri): String? {
         return try {
             val inputStream = context.contentResolver.openInputStream(imageUri)
-            val directory = File(context.filesDir, "playlist_covers")
-            if (!directory.exists()) {
-                directory.mkdirs()
-            }
-
+            val directory = File(context.filesDir, "playlist_covers").apply { mkdirs() }
             val fileName = "cover_${System.currentTimeMillis()}.jpg"
             val outputFile = File(directory, fileName)
-            val outputStream = FileOutputStream(outputFile)
 
             inputStream?.use { input ->
-                outputStream.use { output ->
+                FileOutputStream(outputFile).use { output ->
                     input.copyTo(output)
                 }
             }
-
             outputFile.absolutePath
         } catch (e: Exception) {
-            e.printStackTrace()
             null
         }
     }
