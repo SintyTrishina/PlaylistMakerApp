@@ -1,12 +1,12 @@
 package com.example.playlistmakerapp.media.ui.fragments
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +20,8 @@ import com.example.playlistmakerapp.media.domain.model.Playlist
 import com.example.playlistmakerapp.media.ui.viewmodel.NewPlaylistViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
+import java.io.FileOutputStream
 
 class NewPlaylistFragment : Fragment() {
     private var _binding: FragmentNewPlaylistBinding? = null
@@ -86,11 +88,15 @@ class NewPlaylistFragment : Fragment() {
 
         binding.createButton.setOnClickListener {
             if (playlistName.isNotBlank()) {
+                val savedImagePath = imageUri?.let { uri ->
+                    saveImageToInternalStorage(requireContext(), uri)
+                }
+
                 val newPlaylist = Playlist(
                     id = 0,
                     name = playlistName,
                     description = playlistDescription,
-                    imagePath = imageUri.toString(),
+                    imagePath = savedImagePath,
                     trackIds = emptyList(),
                     tracksCount = 0
                 )
@@ -105,6 +111,31 @@ class NewPlaylistFragment : Fragment() {
 
                 findNavController().navigateUp()
             }
+        }
+    }
+
+    private fun saveImageToInternalStorage(context: Context, imageUri: Uri): String? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(imageUri)
+            val directory = File(context.filesDir, "playlist_covers")
+            if (!directory.exists()) {
+                directory.mkdirs()
+            }
+
+            val fileName = "cover_${System.currentTimeMillis()}.jpg"
+            val outputFile = File(directory, fileName)
+            val outputStream = FileOutputStream(outputFile)
+
+            inputStream?.use { input ->
+                outputStream.use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            outputFile.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 

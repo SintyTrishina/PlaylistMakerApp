@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmakerapp.R
@@ -53,22 +54,43 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun setupAdapters() {
-        playlistsAdapter = PlaylistBehaviorAdapter { playlist ->
-            currentTrack?.let { track ->
-                viewModel.addTrackToPlaylist(track, playlist)
+        playlistsAdapter = PlaylistBehaviorAdapter(
+            onPlaylistClickListener = { playlist ->
+                currentTrack?.let { track ->
+                    viewModel.addTrackToPlaylist(track, playlist)
+                }
+            },
+            loadImage = { path ->
+                try {
+                    Glide.with(requireContext())
+                        .asBitmap()
+                        .load(path)
+                        .submit()
+                        .get()
+                } catch (e: Exception) {
+                    null
+                }
             }
+        )
+        binding.recyclerView.apply {
+            adapter = playlistsAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
         }
-        binding.recyclerView.adapter = playlistsAdapter
     }
 
     private fun initBottomSheet() {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
+            peekHeight = 0
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     when (newState) {
                         BottomSheetBehavior.STATE_HIDDEN -> binding.overlay.visibility = View.GONE
                         else -> binding.overlay.visibility = View.VISIBLE
+                    }
+                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        viewModel.loadPlaylists()
                     }
                 }
 
@@ -95,7 +117,7 @@ class AudioPlayerFragment : Fragment() {
         binding.createPlaylistButton.setOnClickListener {
             findNavController().navigate(R.id.action_audioPlayerFragment_to_newPlaylistFragment)
                 .also {
-                    // Ожидаем результат создания плейлиста
+
                     findNavController().currentBackStackEntry
                         ?.savedStateHandle
                         ?.getLiveData<Boolean>("playlist_created")
@@ -138,7 +160,7 @@ class AudioPlayerFragment : Fragment() {
                 when (it) {
                     is AudioPlayerViewModel.AddToPlaylistStatus.Success -> {
                         showToast("Добавлено в плейлист ${it.playlistName}")
-                        viewModel.loadPlaylists() // Обновляем список после добавления
+                        viewModel.loadPlaylists()
                     }
 
                     is AudioPlayerViewModel.AddToPlaylistStatus.AlreadyExists -> {
@@ -150,7 +172,6 @@ class AudioPlayerFragment : Fragment() {
             }
         }
     }
-
 
 
     private fun setupTrackInfo() {

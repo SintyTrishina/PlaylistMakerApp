@@ -1,5 +1,8 @@
 package com.example.playlistmakerapp.media.ui.fragments
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -39,12 +42,11 @@ class PlaylistsFragment : Fragment() {
     private fun setupRecyclerView() {
         adapter = PlaylistAdapter(
             onPlaylistClick = { playlist ->
-            }
+            },
+            loadImage = { path -> loadImageFromInternalStorage(requireContext(), path) }
         )
 
-        binding.recyclerView.apply {
-            adapter = this@PlaylistsFragment.adapter
-        }
+        binding.recyclerView.adapter = adapter
     }
 
     private fun setupObservers() {
@@ -67,6 +69,17 @@ class PlaylistsFragment : Fragment() {
         }
     }
 
+
+    private fun loadImageFromInternalStorage(context: Context, path: String?): Bitmap? {
+        if (path.isNullOrEmpty()) return null
+
+        return try {
+            BitmapFactory.decodeFile(path)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     override fun onResume() {
         super.onResume()

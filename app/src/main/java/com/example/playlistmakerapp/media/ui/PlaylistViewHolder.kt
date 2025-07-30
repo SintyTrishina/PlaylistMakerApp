@@ -1,6 +1,7 @@
 package com.example.playlistmakerapp.media.ui
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
@@ -18,16 +19,25 @@ class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val playlistName: TextView = itemView.findViewById(R.id.playlistName)
     private val tracksCount: TextView = itemView.findViewById(R.id.tracksCount)
 
-    fun bind(item: Playlist) {
+    fun bind(item: Playlist, loadImage: (String) -> Bitmap?) {
         playlistName.text = item.name
         tracksCount.text = convertText(item.tracksCount)
-        val cornerRadius = dpToPx(8f, itemView.context)
-        Glide.with(itemView)
-            .load(item.imagePath)
-            .placeholder(R.drawable.placeholder)
-            .error(R.drawable.placeholder)
-            .transform(CenterCrop(),RoundedCorners(cornerRadius))
-            .into(playlistPoster)
+
+        item.imagePath?.let { path ->
+            loadImage(path)?.let { bitmap ->
+                val cornerRadius = dpToPx(8f, itemView.context)
+                Glide.with(itemView)
+                    .load(bitmap)
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.placeholder)
+                    .transform(CenterCrop(), RoundedCorners(cornerRadius))
+                    .into(playlistPoster)
+            } ?: run {
+                playlistPoster.setImageResource(R.drawable.placeholder)
+            }
+        } ?: run {
+            playlistPoster.setImageResource(R.drawable.placeholder)
+        }
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {
