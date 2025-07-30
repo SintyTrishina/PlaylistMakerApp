@@ -330,6 +330,7 @@
         android:layout_width="match_parent"
         android:layout_height="505dp"
         android:background="@drawable/bottom_sheet"
+        android:paddingBottom="40dp"
         android:orientation="vertical"
         app:behavior_hideable="true"
         app:behavior_peekHeight="0dp"

@@ -2,15 +2,16 @@ package com.example.playlistmakerapp.media.ui.fragments
 
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmakerapp.R
@@ -47,34 +48,18 @@ class NewPlaylistFragment : Fragment() {
     }
 
     private fun setupTextWatchers() {
-        val playlistNameTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(p0: Editable?) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()) {
-                    binding.createButton.isEnabled = false
-                } else {
-                    binding.createButton.isEnabled = true
-                    playlistName = s.toString()
-                }
+        binding.playlistNameEditText.doOnTextChanged { text, _, _, _ ->
+            if (text.isNullOrEmpty()) {
+                binding.createButton.isEnabled = false
+            } else {
+                binding.createButton.isEnabled = true
+                playlistName = text.toString()
             }
         }
 
-
-        val playlistDescriptionTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(p0: Editable?) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                playlistDescription = if (s.isNullOrEmpty()) {
-                    null
-                } else {
-                    s.toString()
-                }
-            }
+        binding.playlistDescriptionEditText.doOnTextChanged { text, _, _, _ ->
+            playlistDescription = text?.toString()
         }
-
-        binding.playlistNameEditText.addTextChangedListener(playlistNameTextWatcher)
-        binding.playlistDescriptionEditText.addTextChangedListener(playlistDescriptionTextWatcher)
     }
 
     private fun setupListeners() {
@@ -82,18 +67,16 @@ class NewPlaylistFragment : Fragment() {
             dialog()
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(object: OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                dialog()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            dialog()
+        }
 
         val pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
                     binding.imagePlaylist.setImageURI(uri)
-                    binding.imagePlaylist.visibility = View.VISIBLE
-                    binding.icon.visibility = View.GONE
+                    binding.imagePlaylist.isVisible = true
+                    binding.icon.isVisible = false
                     imageUri = uri
                 }
             }
