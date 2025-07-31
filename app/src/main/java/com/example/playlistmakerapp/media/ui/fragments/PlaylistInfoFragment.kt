@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmakerapp.R
@@ -62,8 +63,10 @@ class PlaylistInfoFragment : Fragment() {
         with(binding) {
 
             playlistName.text = state.playlist.name
-            playlistDescription.text = state.playlist.description
-
+            if (state.playlist.description != null) {
+                playlistDescription.isVisible = true
+                playlistDescription.text = state.playlist.description
+            }
 
             minutes.text = "${state.duration}"
             counts.text = "${convertTrackCountText(state.tracksCount)}"
