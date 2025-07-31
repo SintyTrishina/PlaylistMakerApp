@@ -33,7 +33,7 @@ class PlaylistBehaviorViewHolder(
         playlistName.text = playlist.name
         playlistTracksCount.text = convertTrackCountText(playlist.tracksCount)
 
-        // Загрузка изображения
+
         val cornerRadius = dpToPx(2f, itemView.context)
         loadImage(playlist.imagePath)?.let { bitmap ->
             Glide.with(itemView)

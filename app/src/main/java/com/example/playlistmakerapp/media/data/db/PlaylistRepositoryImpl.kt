@@ -1,6 +1,7 @@
 package com.example.playlistmakerapp.media.data.db
 
 import com.example.playlistmakerapp.media.data.db.entity.PlaylistEntity
+import com.example.playlistmakerapp.media.data.db.entity.toDomain
 import com.example.playlistmakerapp.media.data.db.entity.toPlaylistTrackEntity
 import com.example.playlistmakerapp.media.domain.db.PlaylistRepository
 import com.example.playlistmakerapp.media.domain.model.Playlist
@@ -39,5 +40,14 @@ class PlaylistRepositoryImpl(private val appDataBase: AppDataBase) : PlaylistRep
 
     override suspend fun getPlaylists(): List<Playlist> {
         return appDataBase.playlistDao().getAllPlaylistsSync().map { it.toDomain() }
+    }
+
+    override fun getTracksByIds(trackIds: List<String>): Flow<List<Track>> {
+
+        return appDataBase.playlistTracksDao()
+            .getTracksByIds(trackIds)
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }
     }
 }

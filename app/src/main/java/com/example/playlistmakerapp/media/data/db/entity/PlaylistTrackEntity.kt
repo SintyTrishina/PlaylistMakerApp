@@ -38,3 +38,19 @@ data class PlaylistTrackEntity(
 fun Track.toPlaylistTrackEntity(): PlaylistTrackEntity {
     return PlaylistTrackEntity.fromDomain(this)
 }
+
+fun PlaylistTrackEntity.toDomain(): Track {
+    return Track(
+        this.trackId.toInt(),
+        this.trackName,
+        this.artistName,
+        this.trackTimeMillis,
+        this.artworkUrl100,
+        this.collectionName,
+        this.releaseDate,
+        this.primaryGenreName,
+        this.country,
+        this.previewUrl,
+
+        )
+}

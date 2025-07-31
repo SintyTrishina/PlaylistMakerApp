@@ -34,6 +34,9 @@
         <action
             android:id="@+id/action_mediaFragment_to_newPlaylistFragment"
             app:destination="@id/newPlaylistFragment" />
+        <action
+            android:id="@+id/action_mediaFragment_to_playlistInfoFragment"
+            app:destination="@id/playlistInfoFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -44,4 +47,8 @@
         android:id="@+id/newPlaylistFragment"
         android:name="com.example.playlistmakerapp.media.ui.fragments.NewPlaylistFragment"
         android:label="NewPlaylistFragment" />
+    <fragment
+        android:id="@+id/playlistInfoFragment"
+        android:name="com.example.playlistmakerapp.media.ui.fragments.PlaylistInfoFragment"
+        android:label="PlaylistInfoFragment" />
 </navigation>
