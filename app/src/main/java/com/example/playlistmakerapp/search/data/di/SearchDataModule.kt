@@ -49,6 +49,7 @@ val searchDataModule = module {
 
     single {
         Room.databaseBuilder(androidContext(), AppDataBase::class.java, "database.db")
+            .fallbackToDestructiveMigration(false)
             .build()
     }
 

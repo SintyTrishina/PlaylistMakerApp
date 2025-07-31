@@ -79,8 +79,8 @@
 
         <ProgressBar
             android:id="@+id/progressBar"
-            android:layout_width="@dimen/progressBar"
-            android:layout_height="@dimen/progressBar"
+            android:layout_width="@dimen/size44"
+            android:layout_height="@dimen/size44"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="124dp"
             android:indeterminateTint="@color/progressBarColor"

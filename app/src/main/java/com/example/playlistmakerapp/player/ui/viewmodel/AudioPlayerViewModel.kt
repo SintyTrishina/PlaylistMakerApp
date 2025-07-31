@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmakerapp.media.domain.db.PlaylistInteractor
+import com.example.playlistmakerapp.media.domain.model.Playlist
 import com.example.playlistmakerapp.search.domain.db.FavouritesInteractor
 import com.example.playlistmakerapp.search.domain.models.Track
 import kotlinx.coroutines.Job
@@ -15,7 +17,8 @@ import java.util.Locale
 
 class AudioPlayerViewModel(
     private val mediaPlayer: MediaPlayer,
-    private val favouritesInteractor: FavouritesInteractor
+    private val favouritesInteractor: FavouritesInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
     private var timerJob: Job? = null
@@ -28,8 +31,40 @@ class AudioPlayerViewModel(
 
     private var previewUrl: String? = null
 
+    private val _playlists = MutableLiveData<List<Playlist>>()
+    val playlists: LiveData<List<Playlist>> get() = _playlists
+
+    private val _addToPlaylistStatus = MutableLiveData<AddToPlaylistStatus?>()
+    val addToPlaylistStatus: LiveData<AddToPlaylistStatus?> get() = _addToPlaylistStatus
+
     init {
         _playerState.value = AudioPlayerState.Default()
+    }
+
+
+    fun loadPlaylists() {
+        viewModelScope.launch {
+            _playlists.value = playlistInteractor.getPlaylists()
+        }
+    }
+
+    fun addTrackToPlaylist(track: Track, playlist: Playlist) {
+        viewModelScope.launch {
+            if (playlist.trackIds.contains(track.trackId.toString())) {
+                _addToPlaylistStatus.postValue(AddToPlaylistStatus.AlreadyExists(playlist.name))
+            } else {
+                playlistInteractor.addTrackToPlaylist(track, playlist)
+                _addToPlaylistStatus.postValue(AddToPlaylistStatus.Success(playlist.name))
+            }
+        }
+    }
+    sealed class AddToPlaylistStatus {
+        data class Success(val playlistName: String) : AddToPlaylistStatus()
+        data class AlreadyExists(val playlistName: String) : AddToPlaylistStatus()
+    }
+
+    fun addToPlaylistStatusHandled() {
+        _addToPlaylistStatus.value = null
     }
 
     override fun onCleared() {

@@ -1,44 +1,89 @@
 package com.example.playlistmakerapp.media.ui.fragments
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentPlaylistsBinding
+import com.example.playlistmakerapp.media.ui.PlaylistAdapter
 import com.example.playlistmakerapp.media.ui.viewmodel.PlaylistsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class PlaylistsFragment : Fragment() {
-
-    private val playlistsViewModel: PlaylistsViewModel by viewModel {
-        parametersOf(
-            requireArguments().getInt(
-                PLAYLIST_ID
-            )
-        )
-    }
-
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
+    private val viewModel by viewModel<PlaylistsViewModel>()
+    private lateinit var adapter: PlaylistAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentPlaylistsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        playlistsViewModel.playlistIdLiveData.observe(viewLifecycleOwner) {
-            showError()
-        }
 
+        setupRecyclerView()
+        setupObservers()
+        setupClickListeners()
+    }
+
+    private fun setupRecyclerView() {
+        adapter = PlaylistAdapter(
+            onPlaylistClick = { playlist ->
+            },
+            loadImage = { path -> loadImageFromInternalStorage(requireContext(), path) }
+        )
+
+        binding.recyclerView.adapter = adapter
+    }
+
+    private fun setupObservers() {
+        viewModel.playlists.observe(viewLifecycleOwner) { playlists ->
+            adapter.submitList(playlists)
+            updateEmptyState(playlists.isEmpty())
+        }
+    }
+
+    private fun updateEmptyState(isEmpty: Boolean) {
+        binding.apply {
+            errorGroup.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            recyclerView.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        }
+    }
+
+    private fun setupClickListeners() {
+        binding.createPlaylistButton.setOnClickListener {
+            findNavController().navigate(R.id.action_mediaFragment_to_newPlaylistFragment)
+        }
+    }
+
+
+    private fun loadImageFromInternalStorage(context: Context, path: String?): Bitmap? {
+        if (path.isNullOrEmpty()) return null
+
+        return try {
+            BitmapFactory.decodeFile(path)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadPlaylists()
     }
 
     override fun onDestroyView() {
@@ -46,16 +91,10 @@ class PlaylistsFragment : Fragment() {
         _binding = null
     }
 
-    private fun showError() {
-        binding.playlistsRoot.visibility = View.VISIBLE
-    }
-
     companion object {
-        private const val PLAYLIST_ID = "playlistId"
-
-        fun newInstance(playlistId: Int): Fragment {
+        fun newInstance(): PlaylistsFragment {
             return PlaylistsFragment().apply {
-                arguments = bundleOf(PLAYLIST_ID to playlistId)
+                arguments = bundleOf()
             }
         }
     }
