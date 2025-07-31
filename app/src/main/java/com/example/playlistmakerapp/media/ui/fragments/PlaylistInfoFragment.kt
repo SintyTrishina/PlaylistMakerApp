@@ -1,5 +1,6 @@
 package com.example.playlistmakerapp.media.ui.fragments
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +9,12 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentPlaylistInfoBinding
 import com.example.playlistmakerapp.media.ui.viewmodel.PlaylistInfoViewModel
 import com.example.playlistmakerapp.media.ui.viewmodel.PlaylistState
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
 
 class PlaylistInfoFragment : Fragment() {
     private var _binding: FragmentPlaylistInfoBinding? = null
@@ -36,7 +39,7 @@ class PlaylistInfoFragment : Fragment() {
         val playlistId = arguments?.getLong("playlistId") ?: -1L
 
 
-        binding.toolBar.setNavigationOnClickListener {
+        binding.toolBar.setOnClickListener {
             findNavController().navigateUp()
         }
 
@@ -65,7 +68,33 @@ class PlaylistInfoFragment : Fragment() {
             minutes.text = "${state.duration}"
             counts.text = "${convertTrackCountText(state.tracksCount)}"
 
+            state.playlist.imagePath?.let { imagePath ->
+                loadPlaylistImage(imagePath)
+            } ?: run {
+                imagePlaylist.setImageResource(R.drawable.placeholder)
+            }
+        }
+    }
 
+    private fun loadPlaylistImage(imagePath: String) {
+        try {
+
+            val file = if (imagePath.contains("playlist_covers")) {
+                File(imagePath)
+            } else {
+                File(requireContext().filesDir, "playlist_covers/$imagePath")
+            }
+
+            if (file.exists()) {
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                if (bitmap != null) {
+                    binding.imagePlaylist.setImageBitmap(bitmap)
+                    return
+                }
+            }
+            binding.imagePlaylist.setImageResource(R.drawable.placeholder)
+        } catch (e: Exception) {
+            binding.imagePlaylist.setImageResource(R.drawable.placeholder)
         }
     }
 

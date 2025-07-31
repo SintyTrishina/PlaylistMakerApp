@@ -10,26 +10,27 @@
         android:layout_height="match_parent"
         android:background="@color/viewMenu">
 
-        <com.google.android.material.appbar.MaterialToolbar
+        <ImageView
             android:id="@+id/toolBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:contentInsetStart="@dimen/padding"
+            android:layout_marginVertical="20dp"
+            android:layout_marginStart="20dp"
+            android:elevation="32dp"
+            android:src="@drawable/smallarrow"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:navigationIcon="@drawable/arrowback" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/imagePlaylist"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:paddingHorizontal="@dimen/margine24"
-            android:paddingVertical="@dimen/margine24"
-            android:src="@drawable/placeholder"
+            android:scaleType="centerCrop"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/placeholder"/>
 
         <TextView
             android:id="@+id/playlistName"
