@@ -50,4 +50,30 @@ class PlaylistRepositoryImpl(private val appDataBase: AppDataBase) : PlaylistRep
                 entities.map { it.toDomain() }
             }
     }
+
+    override suspend fun removeTrackFromPlaylist(trackId: String, playlist: Playlist) {
+        val updatedTrackIds = playlist.trackIds - trackId
+        val updatedPlaylist = playlist.copy(
+            trackIds = updatedTrackIds,
+            tracksCount = updatedTrackIds.size
+        )
+        appDataBase.playlistDao().update(PlaylistEntity.fromDomain(updatedPlaylist))
+
+        checkAndRemoveOrphanedTrack(trackId)
+    }
+
+    override suspend fun checkAndRemoveOrphanedTrack(trackId: String) {
+
+        val allPlaylists = appDataBase.playlistDao().getAllPlaylistsSync()
+
+        val isTrackUsed = allPlaylists.any { playlist ->
+            playlist.tracksIds?.contains(trackId) == true
+        }
+
+        if (!isTrackUsed) {
+            appDataBase.playlistTracksDao().deleteTrack(trackId)
+        }
+    }
+
+
 }

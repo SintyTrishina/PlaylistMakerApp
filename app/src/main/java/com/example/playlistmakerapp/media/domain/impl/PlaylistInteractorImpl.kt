@@ -50,4 +50,8 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
     override fun getTracksByIds(trackIds: List<String>): Flow<List<Track>> {
         return playlistRepository.getTracksByIds(trackIds)
     }
+
+    override suspend fun removeTrackFromPlaylist(trackId: String, playlist: Playlist) {
+        playlistRepository.removeTrackFromPlaylist(trackId, playlist)
+    }
 }

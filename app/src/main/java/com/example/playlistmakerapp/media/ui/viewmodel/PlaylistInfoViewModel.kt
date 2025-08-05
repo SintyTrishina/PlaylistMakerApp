@@ -27,12 +27,11 @@ class PlaylistInfoViewModel(private val playlistInteractor: PlaylistInteractor) 
                 }
 
                 val tracks = playlistInteractor.getTracksByIds(playlist.trackIds).first()
-
                 val totalDuration = tracks.sumOf { it.trackTimeMillis ?: 0 }
                 val formattedDuration = formatDuration(totalDuration)
 
                 _playlistState.value = PlaylistState.Content(
-                    playlist = playlist,
+                    playlist = playlist.copy(tracksCount = tracks.size),
                     tracks = tracks,
                     duration = formattedDuration,
                     tracksCount = tracks.size
@@ -52,23 +51,19 @@ class PlaylistInfoViewModel(private val playlistInteractor: PlaylistInteractor) 
         )
     }
 
-//    fun removeTrackFromPlaylist(track: Track) {
-//        viewModelScope.launch {
-//            try {
-//                val currentState = playlistState.value as? PlaylistState.Content ?: return@launch
-//                val updatedTrackIds = currentState.playlist.trackIds - track.trackId
-//
-//                playlistInteractor.updatePlaylist(
-//                    currentState.playlist.copy(trackIds = updatedTrackIds)
-//                )
-//
-//                // Перезагружаем данные плейлиста
-//                loadPlaylistInfo(currentState.playlist.id)
-//            } catch (e: Exception) {
-//                _playlistState.value = PlaylistState.Error("Ошибка при удалении трека")
-//            }
-//        }
-//    }
+    fun removeTrackFromPlaylist(track: Track, playlist: Playlist) {
+        viewModelScope.launch {
+            try {
+                playlistInteractor.removeTrackFromPlaylist(
+                    trackId = track.trackId.toString(),
+                    playlist = playlist
+                )
+                loadPlaylistInfo(playlist.id)
+            } catch (e: Exception) {
+                _playlistState.postValue(PlaylistState.Error("Ошибка при удалении трека: ${e.message}"))
+            }
+        }
+    }
 
 }
 

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -79,7 +78,6 @@ class PlaylistInfoFragment : Fragment() {
 
     private fun showContent(state: PlaylistState.Content) {
         with(binding) {
-
             playlistName.text = state.playlist.name
             if (state.playlist.description != null) {
                 playlistDescription.isVisible = true
@@ -94,6 +92,7 @@ class PlaylistInfoFragment : Fragment() {
             } ?: run {
                 imagePlaylist.setImageResource(R.drawable.placeholder)
             }
+
             trackAdapter.tracks.clear()
             trackAdapter.tracks.addAll(state.tracks)
             trackAdapter.notifyDataSetChanged()
@@ -136,10 +135,13 @@ class PlaylistInfoFragment : Fragment() {
     }
 
     private fun showDeleteDialog(track: Track) {
+        val currentPlaylist = (viewModel.playlistState.value as? PlaylistState.Content)?.playlist
+            ?: return
+
         MaterialAlertDialogBuilder(requireContext())
-            .setMessage("Хотите удалить трек?")
+            .setMessage("Удалить трек из плейлиста?")
             .setPositiveButton("Да") { _, _ ->
-//                viewModel.removeTrackFromPlaylist(track)
+                viewModel.removeTrackFromPlaylist(track, currentPlaylist)
             }
             .setNegativeButton("Нет", null)
             .show()
