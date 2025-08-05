@@ -52,6 +52,24 @@ class PlaylistInfoViewModel(private val playlistInteractor: PlaylistInteractor) 
         )
     }
 
+//    fun removeTrackFromPlaylist(track: Track) {
+//        viewModelScope.launch {
+//            try {
+//                val currentState = playlistState.value as? PlaylistState.Content ?: return@launch
+//                val updatedTrackIds = currentState.playlist.trackIds - track.trackId
+//
+//                playlistInteractor.updatePlaylist(
+//                    currentState.playlist.copy(trackIds = updatedTrackIds)
+//                )
+//
+//                // Перезагружаем данные плейлиста
+//                loadPlaylistInfo(currentState.playlist.id)
+//            } catch (e: Exception) {
+//                _playlistState.value = PlaylistState.Error("Ошибка при удалении трека")
+//            }
+//        }
+//    }
+
 }
 
 sealed class PlaylistState {

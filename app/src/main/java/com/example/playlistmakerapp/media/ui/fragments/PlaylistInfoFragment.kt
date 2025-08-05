@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -14,6 +15,9 @@ import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentPlaylistInfoBinding
 import com.example.playlistmakerapp.media.ui.viewmodel.PlaylistInfoViewModel
 import com.example.playlistmakerapp.media.ui.viewmodel.PlaylistState
+import com.example.playlistmakerapp.search.domain.models.Track
+import com.example.playlistmakerapp.search.ui.TrackAdapter
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
@@ -22,6 +26,19 @@ class PlaylistInfoFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PlaylistInfoViewModel by viewModel()
+
+    private val trackAdapter by lazy {
+        TrackAdapter { track ->
+            findNavController().navigate(
+                R.id.action_playlistInfoFragment_to_audioPlayerFragment,
+                createArgs(track)
+            )
+        }.apply {
+            setOnLongClickListener { track ->
+                showDeleteDialog(track)
+            }
+        }
+    }
 
 
     override fun onCreateView(
@@ -39,6 +56,7 @@ class PlaylistInfoFragment : Fragment() {
 
         val playlistId = arguments?.getLong("playlistId") ?: -1L
 
+        binding.recyclerView.adapter = trackAdapter
 
         binding.toolBar.setOnClickListener {
             findNavController().navigateUp()
@@ -76,6 +94,9 @@ class PlaylistInfoFragment : Fragment() {
             } ?: run {
                 imagePlaylist.setImageResource(R.drawable.placeholder)
             }
+            trackAdapter.tracks.clear()
+            trackAdapter.tracks.addAll(state.tracks)
+            trackAdapter.notifyDataSetChanged()
         }
     }
 
@@ -114,8 +135,25 @@ class PlaylistInfoFragment : Fragment() {
         Toast.makeText(requireContext(), "ERROR", Toast.LENGTH_LONG).show()
     }
 
+    private fun showDeleteDialog(track: Track) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setMessage("Хотите удалить трек?")
+            .setPositiveButton("Да") { _, _ ->
+//                viewModel.removeTrackFromPlaylist(track)
+            }
+            .setNegativeButton("Нет", null)
+            .show()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val TRACK_KEY = "track_key"
+        fun createArgs(track: Track): Bundle = Bundle().apply {
+            putParcelable(TRACK_KEY, track)
+        }
     }
 }
