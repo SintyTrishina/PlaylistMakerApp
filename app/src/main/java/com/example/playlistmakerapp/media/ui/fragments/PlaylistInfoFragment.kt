@@ -1,5 +1,6 @@
 package com.example.playlistmakerapp.media.ui.fragments
 
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmakerapp.R
 import com.example.playlistmakerapp.databinding.FragmentPlaylistInfoBinding
+import com.example.playlistmakerapp.media.domain.model.Playlist
 import com.example.playlistmakerapp.media.ui.viewmodel.PlaylistInfoViewModel
 import com.example.playlistmakerapp.media.ui.viewmodel.PlaylistState
 import com.example.playlistmakerapp.search.domain.models.Track
@@ -19,6 +21,7 @@ import com.example.playlistmakerapp.search.ui.TrackAdapter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
+import java.util.Locale
 
 class PlaylistInfoFragment : Fragment() {
     private var _binding: FragmentPlaylistInfoBinding? = null
@@ -73,6 +76,8 @@ class PlaylistInfoFragment : Fragment() {
         }
 
         viewModel.loadPlaylistInfo(playlistId)
+
+        setupShareButton()
     }
 
 
@@ -84,8 +89,8 @@ class PlaylistInfoFragment : Fragment() {
                 playlistDescription.text = state.playlist.description
             }
 
-            minutes.text = "${state.duration}"
-            counts.text = "${convertTrackCountText(state.tracksCount)}"
+            minutes.text = state.duration
+            counts.text = convertTrackCountText(state.tracksCount)
 
             state.playlist.imagePath?.let { imagePath ->
                 loadPlaylistImage(imagePath)
@@ -138,13 +143,78 @@ class PlaylistInfoFragment : Fragment() {
         val currentPlaylist = (viewModel.playlistState.value as? PlaylistState.Content)?.playlist
             ?: return
 
+        binding.overlay.isVisible = true
+
         MaterialAlertDialogBuilder(requireContext())
-            .setMessage("Удалить трек из плейлиста?")
+            .setMessage("Хотите удалить трек?")
             .setPositiveButton("Да") { _, _ ->
                 viewModel.removeTrackFromPlaylist(track, currentPlaylist)
+                binding.overlay.isVisible = false
             }
-            .setNegativeButton("Нет", null)
+            .setNegativeButton("Нет") { _, _ ->
+                binding.overlay.isVisible = false
+            }
+            .setOnDismissListener {
+                binding.overlay.isVisible = false
+            }
             .show()
+    }
+    private fun setupShareButton() {
+        binding.shareButton.setOnClickListener {
+            val state = viewModel.playlistState.value
+            if (state is PlaylistState.Content) {
+                if (state.tracks.isEmpty()) {
+                    Toast.makeText(
+                        requireContext(),
+                        "В этом плейлисте нет списка треков, которым можно поделиться",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+
+                    sharePlaylist(state.playlist, state.tracks)
+                }
+            }
+        }
+    }
+
+    private fun sharePlaylist(playlist: Playlist, tracks: List<Track>) {
+        val shareText = buildShareText(playlist, tracks)
+
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+        }
+
+        startActivity(Intent.createChooser(shareIntent, "Поделиться плейлистом"))
+    }
+
+    private fun buildShareText(playlist: Playlist, tracks: List<Track>): String {
+        val stringBuilder = StringBuilder()
+
+        stringBuilder.append(playlist.name).append("\n")
+
+        playlist.description?.let {
+            stringBuilder.append(it).append("\n")
+        }
+
+        stringBuilder.append(convertTrackCountText(tracks.size)).append("\n\n")
+
+        tracks.forEachIndexed { index, track ->
+            stringBuilder.append("${index + 1}. ${track.artistName} - ${track.trackName} (${formatTrackDuration(track.trackTimeMillis)})\n")
+        }
+
+        return stringBuilder.toString()
+    }
+
+    private fun formatTrackDuration(millis: Long?): String {
+        if (millis == null) return "0:00"
+
+        val totalSeconds = millis / 1000
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+
+        return String.format(Locale.getDefault(), "%d:%02d", minutes, seconds)
     }
 
     override fun onDestroyView() {
