@@ -51,6 +51,16 @@ class PlaylistInfoViewModel(private val playlistInteractor: PlaylistInteractor) 
         )
     }
 
+    fun deletePlaylist(playlist: Playlist) {
+        viewModelScope.launch {
+            try {
+                playlistInteractor.deletePlaylistById(playlist.id)
+            } catch (e: Exception) {
+                _playlistState.postValue(PlaylistState.Error("Ошибка при удалении плейлиста: ${e.message}"))
+            }
+        }
+    }
+
     fun removeTrackFromPlaylist(track: Track, playlist: Playlist) {
         viewModelScope.launch {
             try {

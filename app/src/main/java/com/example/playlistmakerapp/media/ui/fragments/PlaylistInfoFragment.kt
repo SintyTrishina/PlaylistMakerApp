@@ -18,6 +18,7 @@ import com.example.playlistmakerapp.media.ui.viewmodel.PlaylistInfoViewModel
 import com.example.playlistmakerapp.media.ui.viewmodel.PlaylistState
 import com.example.playlistmakerapp.search.domain.models.Track
 import com.example.playlistmakerapp.search.ui.TrackAdapter
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -78,6 +79,87 @@ class PlaylistInfoFragment : Fragment() {
         viewModel.loadPlaylistInfo(playlistId)
 
         setupShareButton()
+
+        binding.menuButton.setOnClickListener {
+            showMenuBottomSheet()
+        }
+
+        binding.share.setOnClickListener {
+            shareCurrentPlaylist()
+            hideMenuBottomSheet()
+        }
+
+        binding.delete.setOnClickListener {
+            hideMenuBottomSheet()
+            showDeletePlaylistDialog()
+        }
+    }
+
+    private fun showMenuBottomSheet() {
+        val state = viewModel.playlistState.value as? PlaylistState.Content ?: return
+
+        binding.overlay.isVisible = true
+        binding.menuBottomSheet.isVisible = true
+
+        binding.behaviorName.text = state.playlist.name
+        binding.tracksCount.text = convertTrackCountText(state.tracks.size)
+
+        state.playlist.imagePath?.let { imagePath ->
+            try {
+                val file = if (imagePath.contains("playlist_covers")) {
+                    File(imagePath)
+                } else {
+                    File(requireContext().filesDir, "playlist_covers/$imagePath")
+                }
+                if (file.exists()) {
+                    val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                    binding.poster.setImageBitmap(bitmap)
+                } else {
+                    binding.poster.setImageResource(R.drawable.placeholder)
+                }
+            } catch (e: Exception) {
+                binding.poster.setImageResource(R.drawable.placeholder)
+            }
+        } ?: run {
+            binding.poster.setImageResource(R.drawable.placeholder)
+        }
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.menuBottomSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    hideMenuBottomSheet()
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
+    }
+
+    private fun hideMenuBottomSheet() {
+        binding.overlay.isVisible = false
+        binding.menuBottomSheet.isVisible = false
+    }
+
+    private fun shareCurrentPlaylist() {
+        val state = viewModel.playlistState.value as? PlaylistState.Content ?: return
+        sharePlaylist(state.playlist, state.tracks)
+    }
+
+    private fun showDeletePlaylistDialog() {
+        val playlist = (viewModel.playlistState.value as? PlaylistState.Content)?.playlist ?: return
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Удалить плейлист")
+            .setMessage("Хотите удалить плейлист?")
+            .setPositiveButton("Да") { _, _ ->
+                viewModel.deletePlaylist(playlist)
+                findNavController().navigateUp() // Возвращаемся назад после удаления
+            }
+            .setNegativeButton("Нет", null)
+            .show()
     }
 
 
@@ -159,6 +241,7 @@ class PlaylistInfoFragment : Fragment() {
             }
             .show()
     }
+
     private fun setupShareButton() {
         binding.shareButton.setOnClickListener {
             val state = viewModel.playlistState.value
@@ -201,7 +284,13 @@ class PlaylistInfoFragment : Fragment() {
         stringBuilder.append(convertTrackCountText(tracks.size)).append("\n\n")
 
         tracks.forEachIndexed { index, track ->
-            stringBuilder.append("${index + 1}. ${track.artistName} - ${track.trackName} (${formatTrackDuration(track.trackTimeMillis)})\n")
+            stringBuilder.append(
+                "${index + 1}. ${track.artistName} - ${track.trackName} (${
+                    formatTrackDuration(
+                        track.trackTimeMillis
+                    )
+                })\n"
+            )
         }
 
         return stringBuilder.toString()
