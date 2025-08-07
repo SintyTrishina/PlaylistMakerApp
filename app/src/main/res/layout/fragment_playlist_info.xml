@@ -250,6 +250,7 @@
             android:text="Поделиться" />
 
         <TextView
+            android:id="@+id/edit"
             style="@style/SmallTextStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

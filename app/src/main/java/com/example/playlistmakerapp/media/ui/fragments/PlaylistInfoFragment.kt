@@ -43,7 +43,6 @@ class PlaylistInfoFragment : Fragment() {
         }
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,7 +51,6 @@ class PlaylistInfoFragment : Fragment() {
         _binding = FragmentPlaylistInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -89,10 +87,25 @@ class PlaylistInfoFragment : Fragment() {
             hideMenuBottomSheet()
         }
 
+        binding.edit.setOnClickListener {
+            editCurrentPlaylist()
+            hideMenuBottomSheet()
+        }
+
         binding.delete.setOnClickListener {
             hideMenuBottomSheet()
             showDeletePlaylistDialog()
         }
+    }
+
+    private fun editCurrentPlaylist() {
+        val playlist = (viewModel.playlistState.value as? PlaylistState.Content)?.playlist ?: return
+        findNavController().navigate(
+            R.id.action_playlistInfoFragment_to_newPlaylistFragment,
+            Bundle().apply {
+                putLong("playlist_id_key", playlist.id)
+            }
+        )
     }
 
     private fun showMenuBottomSheet() {
@@ -152,16 +165,15 @@ class PlaylistInfoFragment : Fragment() {
         val playlist = (viewModel.playlistState.value as? PlaylistState.Content)?.playlist ?: return
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Удалить плейлист")
-            .setMessage("Хотите удалить плейлист?")
-            .setPositiveButton("Да") { _, _ ->
+            .setTitle(getString(R.string.delete_playlist_title))
+            .setMessage(getString(R.string.delete_playlist_message))
+            .setPositiveButton(getString(R.string.yes)) { _, _ ->
                 viewModel.deletePlaylist(playlist)
-                findNavController().navigateUp() // Возвращаемся назад после удаления
+                findNavController().navigateUp()
             }
-            .setNegativeButton("Нет", null)
+            .setNegativeButton(getString(R.string.no), null)
             .show()
     }
-
 
     private fun showContent(state: PlaylistState.Content) {
         with(binding) {
@@ -188,7 +200,6 @@ class PlaylistInfoFragment : Fragment() {
 
     private fun loadPlaylistImage(imagePath: String) {
         try {
-
             val file = if (imagePath.contains("playlist_covers")) {
                 File(imagePath)
             } else {
@@ -210,10 +221,10 @@ class PlaylistInfoFragment : Fragment() {
 
     private fun convertTrackCountText(count: Int): String {
         return when {
-            count % 100 in 11..14 -> "$count треков"
-            count % 10 == 1 -> "$count трек"
-            count % 10 in 2..4 -> "$count трека"
-            else -> "$count треков"
+            count % 100 in 11..14 -> "$count ${getString(R.string.tracks)}"
+            count % 10 == 1 -> "$count ${getString(R.string.track)}"
+            count % 10 in 2..4 -> "$count ${getString(R.string.tracks_genitive)}"
+            else -> "$count ${getString(R.string.tracks)}"
         }
     }
 
@@ -228,12 +239,12 @@ class PlaylistInfoFragment : Fragment() {
         binding.overlay.isVisible = true
 
         MaterialAlertDialogBuilder(requireContext())
-            .setMessage("Хотите удалить трек?")
-            .setPositiveButton("Да") { _, _ ->
+            .setMessage(getString(R.string.delete_track_message))
+            .setPositiveButton(getString(R.string.yes)) { _, _ ->
                 viewModel.removeTrackFromPlaylist(track, currentPlaylist)
                 binding.overlay.isVisible = false
             }
-            .setNegativeButton("Нет") { _, _ ->
+            .setNegativeButton(getString(R.string.no)) { _, _ ->
                 binding.overlay.isVisible = false
             }
             .setOnDismissListener {
@@ -249,11 +260,10 @@ class PlaylistInfoFragment : Fragment() {
                 if (state.tracks.isEmpty()) {
                     Toast.makeText(
                         requireContext(),
-                        "В этом плейлисте нет списка треков, которым можно поделиться",
+                        getString(R.string.empty_playlist_share_message),
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-
                     sharePlaylist(state.playlist, state.tracks)
                 }
             }
@@ -269,7 +279,7 @@ class PlaylistInfoFragment : Fragment() {
             type = "text/plain"
         }
 
-        startActivity(Intent.createChooser(shareIntent, "Поделиться плейлистом"))
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_playlist_title)))
     }
 
     private fun buildShareText(playlist: Playlist, tracks: List<Track>): String {
