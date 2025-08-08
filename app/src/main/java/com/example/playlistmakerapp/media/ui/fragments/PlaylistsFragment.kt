@@ -42,6 +42,13 @@ class PlaylistsFragment : Fragment() {
     private fun setupRecyclerView() {
         adapter = PlaylistAdapter(
             onPlaylistClick = { playlist ->
+                val bundle = Bundle().apply {
+                    putLong("playlistId", playlist.id)
+                }
+                findNavController().navigate(
+                    R.id.action_mediaFragment_to_playlistInfoFragment,
+                    bundle
+                )
             },
             loadImage = { path -> loadImageFromInternalStorage(requireContext(), path) }
         )

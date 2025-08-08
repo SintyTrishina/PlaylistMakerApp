@@ -1,6 +1,7 @@
 package com.example.playlistmakerapp.media.data.db
 
 import com.example.playlistmakerapp.media.data.db.entity.PlaylistEntity
+import com.example.playlistmakerapp.media.data.db.entity.toDomain
 import com.example.playlistmakerapp.media.data.db.entity.toPlaylistTrackEntity
 import com.example.playlistmakerapp.media.domain.db.PlaylistRepository
 import com.example.playlistmakerapp.media.domain.model.Playlist
@@ -40,4 +41,39 @@ class PlaylistRepositoryImpl(private val appDataBase: AppDataBase) : PlaylistRep
     override suspend fun getPlaylists(): List<Playlist> {
         return appDataBase.playlistDao().getAllPlaylistsSync().map { it.toDomain() }
     }
+
+    override fun getTracksByIds(trackIds: List<String>): Flow<List<Track>> {
+
+        return appDataBase.playlistTracksDao()
+            .getTracksByIds(trackIds)
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }
+    }
+
+    override suspend fun removeTrackFromPlaylist(trackId: String, playlist: Playlist) {
+        val updatedTrackIds = playlist.trackIds - trackId
+        val updatedPlaylist = playlist.copy(
+            trackIds = updatedTrackIds,
+            tracksCount = updatedTrackIds.size
+        )
+        appDataBase.playlistDao().update(PlaylistEntity.fromDomain(updatedPlaylist))
+
+        checkAndRemoveOrphanedTrack(trackId)
+    }
+
+    override suspend fun checkAndRemoveOrphanedTrack(trackId: String) {
+
+        val allPlaylists = appDataBase.playlistDao().getAllPlaylistsSync()
+
+        val isTrackUsed = allPlaylists.any { playlist ->
+            playlist.tracksIds?.contains(trackId) == true
+        }
+
+        if (!isTrackUsed) {
+            appDataBase.playlistTracksDao().deleteTrack(trackId)
+        }
+    }
+
+
 }
