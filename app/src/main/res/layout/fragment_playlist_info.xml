@@ -147,6 +147,16 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/rectangle_sheet" />
 
+        <TextView
+            android:id="@+id/noTracks"
+            style="@style/TopText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:text="В этом плейлисте нет треков"
+            android:textSize="@dimen/text19"/>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

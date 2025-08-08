@@ -192,9 +192,16 @@ class PlaylistInfoFragment : Fragment() {
                 imagePlaylist.setImageResource(R.drawable.placeholder)
             }
 
-            trackAdapter.tracks.clear()
-            trackAdapter.tracks.addAll(state.tracks)
-            trackAdapter.notifyDataSetChanged()
+            if (state.tracks.isEmpty()) {
+                noTracks.isVisible = true
+                recyclerView.isVisible = false
+            } else {
+                noTracks.isVisible = false
+                recyclerView.isVisible = true
+                trackAdapter.tracks.clear()
+                trackAdapter.tracks.addAll(state.tracks)
+                trackAdapter.notifyDataSetChanged()
+            }
         }
     }
 

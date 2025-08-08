@@ -184,22 +184,17 @@ class NewPlaylistFragment : Fragment() {
     }
 
     private fun checkForChangesAndNavigateBack() {
-        val hasChanges = when {
-            imageUri != null -> true
-            playlistId == 0L -> playlistName.isNotEmpty() || playlistDescription != null
-            else -> {
-                val currentName = binding.playlistNameEditText.text.toString()
-                val currentDescription = binding.playlistDescriptionEditText.text?.toString()
-                currentName != viewModel.getOriginalPlaylistName() ||
-                        currentDescription != viewModel.getOriginalPlaylistDescription() ||
-                        imageUri != null
-            }
-        }
+        val state = viewModel.screenState.value
 
-        if (hasChanges) {
-            showExitConfirmationDialog()
-        } else {
+        if (state is NewPlaylistState.EditState) {
             findNavController().navigateUp()
+        } else {
+            val hasChanges = playlistName.isNotEmpty() || playlistDescription != null || imageUri != null
+            if (hasChanges) {
+                showExitConfirmationDialog()
+            } else {
+                findNavController().navigateUp()
+            }
         }
     }
 
